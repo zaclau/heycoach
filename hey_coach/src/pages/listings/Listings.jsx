@@ -12,7 +12,9 @@ const Listings = () => {
     return (
         <div>
             <Navbar/>
-            <SearchBar setSearchTerm={setSearchTerm} searchTerm={searchTerm}/>
+            <div className="container my-3">
+                <SearchBar setSearchTerm={setSearchTerm} searchTerm={searchTerm}/>
+            </div> 
             <FilterItem icon={"Skills"}>
               <DropdownMenu/>
             </FilterItem>

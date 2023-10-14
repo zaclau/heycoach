@@ -1,0 +1,11 @@
+.form-control {
+    border: 0 !important;
+}
+
+::placeholder {
+    color: white !important;
+}
+
+.input-group-text {
+    border: 0 !important;
+}
