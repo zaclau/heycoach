@@ -1,0 +1,59 @@
+.filter-modal {
+    display: block;
+    background-color: transparent;
+}
+
+@media (min-width: 768px) {
+    .filter-modal {
+        display: none;
+    }
+}
+
+.filter-modal__wrapper {
+    z-index: 50;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: white;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    /* height: 50%; */
+}
+
+.filter-modal__header {
+    display: flex;
+    padding: 1rem 0.5rem;
+    border-bottom-width: 1px;
+    border-bottom-color: #e4e7eb;
+    border-bottom-style: solid;
+    justify-content: flex-end;
+}
+
+.filter-modal__content {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-modal__actions {
+    border-top-width: 1px;
+    border-top-color: #e4e7eb;
+    border-top-style: solid;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.5rem;
+    margin-top: auto;
+}
+
+.filter-modal__actions button {
+    border-radius: 0.125rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #2b7de9;
+    border-color: transparent;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
