@@ -8,6 +8,7 @@ import Listings from "./pages/listings/Listings";
 import Signup from "./pages/signup/Signup";
 import Login from "./pages/login/Login";
 import Bookings from "./pages/bookings/Bookings";
+import CoachProfile from "./pages/coachProfile/CoachProfile";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<Login />}/>
         <Route path="/listings" element={<Listings />}/>
         <Route path="/bookings" element={<Bookings />}/>
+        <Route path="/coaches/:coachId" element={<CoachProfile />}/>
       </Routes>
     </BrowserRouter>
   );

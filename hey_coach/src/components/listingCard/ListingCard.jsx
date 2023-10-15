@@ -1,4 +1,4 @@
-const ListingCard = () => {
+const ListingCard = ({ buttonDesc, buttonAction }) => {
     return (
         // 2 columns: 1 for picture and pricing, 1 for details on the right
         <div className="container justify-content-center p-2">
@@ -16,7 +16,7 @@ const ListingCard = () => {
                     <p>profile blurb</p>
                     <p>long description of mentor</p>
 
-                    <button className="btn btn-dark">View Profile</button>
+                    <button className="btn btn-dark" onClick={ buttonAction }>{ buttonDesc }</button>
                 </div>
             </div>
         </div>

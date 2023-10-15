@@ -4,12 +4,14 @@ import Navbar from "../../components/navbar/Navbar";
 import SearchBar from "../../components/searchBar/SearchBar";
 import Filter from "../../components/filter/Filter";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const topics = ["Health & Fitness", "Arts & Crafts", "Science & Tech", "Mental Health", "Food & Beverages"];
 
 const Listings = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedTopics, setSelectedTopics] = useState([]);
+    const navigate = useNavigate();
 
     const handleSelect = topics => {
       const isSelected = selectedTopics.includes(topics);
@@ -51,8 +53,8 @@ const Listings = () => {
             </div>
           </Filter>
         </div>
-        <ListingCard />
-        <ListingCard />
+        <ListingCard buttonDesc="View Profile" buttonAction={ () => navigate("/coaches/1") }/>
+        <ListingCard buttonDesc="View Profile" buttonAction={ () => navigate("/coaches/1") }/>
         <Footer />
       </div>
     );
