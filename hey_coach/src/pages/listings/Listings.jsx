@@ -12,15 +12,19 @@ const Listings = () => {
     return (
         <div>
             <Navbar/>
-            <div className="container my-3">
-                <SearchBar setSearchTerm={setSearchTerm} searchTerm={searchTerm}/>
-            </div> 
-            <FilterItem icon={"Skills"}>
-              <DropdownMenu/>
-            </FilterItem>
-            <ListingCard/>
-            <ListingCard/>
-            <Footer/>
+            <div className="container-xxl bd-gutter">
+                <div className="container my-3">
+                    <SearchBar setSearchTerm={setSearchTerm} searchTerm={searchTerm}/>
+                </div> 
+                <FilterItem icon={"Skills"}>
+                <DropdownMenu/>
+                </FilterItem>
+                <ListingCard/>
+                <ListingCard/>
+                <Footer/>
+            </div>
+            
+            
         </div>
     );
 }
