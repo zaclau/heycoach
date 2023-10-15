@@ -2,27 +2,60 @@ import Footer from "../../components/footer/Footer";
 import ListingCard from "../../components/listingCard/ListingCard"
 import Navbar from "../../components/navbar/Navbar";
 import SearchBar from "../../components/searchBar/SearchBar";
-import FilterItem from "../../components/filteritem/FilterItem";
-import DropdownMenu from "../../components/dropdownmenu/DropdownMenu";
+import Filter from "../../components/filter/Filter";
 import { useState } from "react";
+
+const topics = ["Health & Fitness", "Arts & Crafts", "Science & Tech", "Mental Health", "Food & Beverages"];
 
 const Listings = () => {
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedTopics, setSelectedTopics] = useState([]);
+
+    const handleSelect = topics => {
+      const isSelected = selectedTopics.includes(topics);
+    /* If the option has already been selected, we remove it from the array. */
+    /* Otherwise, we add it. */ 
+      const newSelection = isSelected ? selectedTopics.filter(currentTop => currentTop !== topics) : [...selectedTopics, topics];
+      setSelectedTopics(newSelection);
+    };
 
     return (
-        <div>
-            <Navbar/>
-            <div className="container my-3">
-                <SearchBar setSearchTerm={setSearchTerm} searchTerm={searchTerm}/>
-            </div> 
-            <FilterItem icon={"Skills"}>
-              <DropdownMenu/>
-            </FilterItem>
-            <ListingCard/>
-            <ListingCard/>
-            <Footer/>
+      <div>
+        <Navbar />
+        <div className="container my-3">
+          <SearchBar setSearchTerm={setSearchTerm} searchTerm={searchTerm} />
         </div>
+        <div className="container my-3">
+          <Filter
+            label="Topics"
+            onapply={() => alert(selectedTopics)}
+          >
+            <div className="topics-list">
+              {topics.map((topic, index) => {
+                const isSelected = selectedTopics.includes(topic);
+                return (
+                  <div key={index}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => {
+                        handleSelect(topic);
+                      }}
+                    />
+                    <span className="ml-2 text-base text-gray-500 font-heading">
+                      {topic}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </Filter>
+        </div>
+        <ListingCard />
+        <ListingCard />
+        <Footer />
+      </div>
     );
-}
+  };
 
 export default Listings;
