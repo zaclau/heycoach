@@ -18,7 +18,6 @@ const Home = () => {
         <TopicList/>
         <h1 className="homeTitle">Coaches trainees love</h1>
         <FeaturedCoaches/>
-        <Signup/>
         <Footer/>
       </div>
     </div>
