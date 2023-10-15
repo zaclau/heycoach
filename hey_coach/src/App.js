@@ -7,6 +7,7 @@ import Home from "./pages/home/Home";
 import Listings from "./pages/listings/Listings";
 import Signup from "./pages/signup/Signup";
 import Login from "./pages/login/Login";
+import CoachProfile from "./pages/coachProfile/CoachProfile";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/signup" element={<Signup />}/>
         <Route path="/login" element={<Login />}/>
         <Route path="/listings" element={<Listings />}/>
+        <Route path="/coaches/:coachId" element={<CoachProfile />}/>
       </Routes>
     </BrowserRouter>
   );
