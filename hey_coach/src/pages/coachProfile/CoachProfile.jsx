@@ -3,15 +3,18 @@ import ListingCard from "../../components/listingCard/ListingCard"
 import { useParams } from "react-router";
 import SocialMediaCard from "../../components/socialMedia/SocialMediaCard";
 import ReviewComments from "../../components/reviewComments/ReviewComments";
+import { useNavigate } from "react-router";
 
 function CoachProfile() {
     const params = useParams();
-    console.log(params.coachId);
+    // console.log(params.coachId);
+
+    const navigate = useNavigate();
     return (
         <div>
             <Navbar />
             <div className="container-xxl bd-gutter">
-                <ListingCard buttonDesc="Schedule a Session"/>
+                <ListingCard buttonDesc="Schedule a Session" buttonAction={() => navigate("/bookings")}/>
                 <hr></hr>
                 <h3 className="fw-semibold my-4">Social Feed</h3>
                 <div className="container">

@@ -55,7 +55,6 @@ const Listings = () => {
         </div>
         <ListingCard buttonDesc="View Profile" buttonAction={ () => navigate("/coaches/1") }/>
         <ListingCard buttonDesc="View Profile" buttonAction={ () => navigate("/coaches/1") }/>
-        <Footer />
       </div>
     );
   };
