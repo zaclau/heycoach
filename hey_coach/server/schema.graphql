@@ -1,18 +1,29 @@
 
+# V2 - central user collection (private), seperate profile collections (safe for public)
 ############################################
-# TYPES AND INPUTS
+# TYPES
 ############################################
 
-interface User {
-    id: ID!
+
+#################
+# PEOPLE objects 
+#################
+
+type User{
+    id: ID! 
     email: String!
     firstName: String!
     lastName: String
     description: String
     profilePictureUrl: String
-    googleOAuthToken: String  # New field for Google OAuth
-    stripeCustomerId: String  # New field for Stripe
-    # Add any other tokens 
+
+    # TOKENS
+    googleOuthToken: String
+    stripeCustomerId: String
+
+    # FLAGS - used to init UI
+    isCoach: Boolean
+    isCoachee: Boolean
 }
 
 type PreferredTimeSlot {
@@ -23,29 +34,17 @@ type PreferredTimeSlot {
 type PreferredDay {
     day: String
     slots: [PreferredTimeSlot]
-
 }
 
-type Coach implements User {
-    
-    # BASELINE FIELDS
-    
-    id: ID!  # Note: decision to use OOTB ID
-    email: String!
-    firstName: String!
-    lastName: String
-    description: String
-    profilePictureUrl: String
-    googleOAuthToken: String  # New field for Google OAuth
-    stripeCustomerId: String  # New field for Stripe
-    # Add any other tokens 
-
-    # COACH FIELDS
-
+type ProfileOfCoach {
+    # Primary Key is ID, not object. This is for security.
+    userId: ID!
+    coachText: String!
     tagsOfSpecialties: [String]
-    sessionSlotsAvailable: [PreferredDay]  # format [[day, [(start, end), (start, end), ...]], [day, [(start, end), (start, end), ...]], [day, [(start, end), (start, end), ...]]] 
-    sessionDuration: Int  # Duration in Mins
-    sessionPrice: Float
+    sessionSlotsAvailable: [PreferredDay]
+    sessionDuration: Int!
+    sessionPrice: Float!
+
 }
 
 enum SessionGoal {
@@ -57,55 +56,41 @@ enum SessionGoal {
     MentalFocus
 }
 
-type Coachee implements User {
-    
-    # BASELINE FIELDS
-
-    id: ID!
-    email: String!
-    firstName: String!
-    lastName: String
-    description: String
-    profilePictureUrl: String
-    googleOAuthToken: String  # New field for Google OAuth
-    stripeCustomerId: String  # New field for Stripe
-
-    # COACHEE FIELDS
-
+type ProfileOfCoachee {
+    userId: ID!
     sessionSlotsPreferred: [DaySchedule]
-    sessionGoals: [SessionGoal]  # format [FatBurn, MuscleBuilding, Wellness....] -> can link to GPT3.5 later to match with coach type
-
+    tagsOfGoals: [SessionGoal]! # can link to GPT3.5 or vector search later to match with coach type
 }
+
+###############
+# EVENT objects
+###############
 
 type CoachingSession {
     id: ID!
-    coach: Coach!
-    coachee: Coachee!
-    dateTime: DateTime!
-    status: SessionStatus!
-    receipt: Receipt
-    location: String
-    review: SessionReview
-    googleCalendarEventId: String  # New field for Google Calendar OR calendly OR scheduling solution used
-}
 
-enum SessionStatus {
-    SCHEDULED
-    CANCELLED
-    COMPLETED
+    # Participant References
+    coachId: ID!           # Reference to the coach's ID
+    coacheeId: ID!         # Reference to the coachee's ID
+
+    # Session Details
+    dateTime: DateTime!    # Date and time of the coaching session
+    status: StatusOfSession! # Status of the session (Scheduled, Cancelled, Completed, etc.)
+    location: String       # Location of the session
+    googleCalendarEventId: String # ID for the event in Google Calendar or other scheduling solutions
+
+    # Financial Information
+    receipt: Receipt       # Receipt information for the session
+
+    # Post-Session Review
+    review: SessionReview  # Review of the session (nullable, as it's post-session data)
 }
 
 type Receipt {
     id: ID!
     stripeId: String!
     amount: Float!
-    status: PaymentStatus!
-}
-
-enum PaymentStatus {
-    PENDING
-    COMPLETED
-    FAILED
+    status: StatusOfPayment!
 }
 
 type SessionReview {
@@ -116,33 +101,54 @@ type SessionReview {
     createdAt: DateTime!
 }
 
+enum StatusOfSession {
+    SCHEDULED
+    CANCELLED
+    COMPLETED
+}
+
+enum StatusOfPayment {
+    PENDING
+    COMPLETED
+    FAILED
+}
+
+
 ############################################
 # INPUTS
 ############################################
 
 input UserInput {
-    userType: UserType!
     email: String!
     password: String
-    firstName: String
+    firstName: String!
     lastName: String
     description: String
     profilePictureUrl: String
-    tagsOfSpecialties: [String]
-    sessionAvailability: [DateTime]
-    sessionPrice: Float
-    preferredTimes: [DateTime]
 }
 
-input UserProfileInput {
-    firstName: String
-    lastName: String
-    description: String
-    profilePictureUrl: String
+input CoachProfileInput {
+    userId: ID!
     tagsOfSpecialties: [String]
-    sessionAvailability: [DateTime]
+    sessionSlotsAvailable: [PreferredDayInput]
+    sessionDuration: Int
     sessionPrice: Float
-    preferredTimes: [DateTime]
+}
+
+input CoacheeProfileInput {
+    userId: ID!
+    sessionSlotsPreferred: [PreferredDayInput]
+    sessionGoals: [SessionGoal]
+}
+
+input PreferredDayInput {
+    day: String
+    slots: [PreferredTimeSlotInput]
+}
+
+input PreferredTimeSlotInput {
+    start: String  # Format: "HH:mm"
+    end: String
 }
 
 input SessionInput {
@@ -152,7 +158,14 @@ input SessionInput {
     location: String
 }
 
-scalar DateTime
+
+input ReviewInput {
+    id: ID!
+    session: CoachingSession!
+    text: String!
+    rating: Int!
+    createdAt: DateTime!
+}
 
 
 ############################################
@@ -160,13 +173,41 @@ scalar DateTime
 ############################################
 
 type Query {
+    
+    ################
+    # User Queries
+    ################
+
     getUser(email: String!): User
+    getUserById(id: ID!): User
+    getAllUsers: [User]
     getSessionsForUser(userId: ID!): [Session]
-    getAllCoaches: [Coach]
+
+    ################
+    # Coach and Coachee Profile Queries
+    ################
+
+    getAllCoachProfiles: [ProfileOfCoach]
+    getAllCoacheeProfiles: [ProfileOfCoachee]
+    getCoachProfile(userId: ID!): ProfileOfCoach
+    getCoacheeProfile(userId: ID!): ProfileOfCoachee
+
+    ################
+    # Session Queries
+    ################
+
+    getCoachingSessionById(id: ID!): CoachingSession
+    getSessionsForCoach(coachId: ID!): [CoachingSession]
+    getSessionsForCoachee(coacheeId: ID!): [CoachingSession]
     getSessionDetails(sessionId: ID!): Session
     getReceiptDetails(receiptId: ID!): Receipt
-}
 
+    # Scheduling Queries
+    # pending 
+
+    # Additional and Modified Queries as per your requirements
+    # pending
+}
 
 
 ############################################

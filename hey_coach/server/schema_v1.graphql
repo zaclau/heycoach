@@ -1,0 +1,184 @@
+
+# V1 - seperate collections for user types.
+############################################
+# TYPES
+############################################
+
+interface User {
+    id: ID!
+    email: String!
+    firstName: String!
+    lastName: String
+    description: String
+    profilePictureUrl: String
+    googleOAuthToken: String  # New field for Google OAuth
+    stripeCustomerId: String  # New field for Stripe
+    # Add any other tokens 
+}
+
+type PreferredTimeSlot {
+    start: String  # Format: "HH:mm"
+    end: String 
+}
+
+type PreferredDay {
+    day: String
+    slots: [PreferredTimeSlot]
+
+}
+
+type Coach implements User {
+    
+    # BASELINE FIELDS
+    
+    id: ID!  # Note: decision to use OOTB ID
+    email: String!
+    firstName: String!
+    lastName: String
+    description: String
+    profilePictureUrl: String
+    googleOAuthToken: String  # New field for Google OAuth
+    stripeCustomerId: String  # New field for Stripe
+    # Add any other tokens 
+
+    # COACH FIELDS
+
+    tagsOfSpecialties: [String]
+    sessionSlotsAvailable: [PreferredDay]  # format [[day, [(start, end), (start, end), ...]], [day, [(start, end), (start, end), ...]], [day, [(start, end), (start, end), ...]]] 
+    sessionDuration: Int  # Duration in Mins
+    sessionPrice: Float
+}
+
+enum SessionGoal {
+    StrengthBuilding
+    EnduranceBuilding
+    AgilityBuilding
+    FatBurn
+    Wellness
+    MentalFocus
+}
+
+type Coachee implements User {
+    
+    # BASELINE FIELDS
+
+    id: ID!
+    email: String!
+    firstName: String!
+    lastName: String
+    description: String
+    profilePictureUrl: String
+    googleOAuthToken: String  # New field for Google OAuth
+    stripeCustomerId: String  # New field for Stripe
+
+    # COACHEE FIELDS
+
+    sessionSlotsPreferred: [DaySchedule]
+    sessionGoals: [SessionGoal]  # format [FatBurn, MuscleBuilding, Wellness....] -> can link to GPT3.5 later to match with coach type
+
+}
+
+type CoachingSession {
+    id: ID!
+    coach: Coach!
+    coachee: Coachee!
+    dateTime: DateTime!
+    status: SessionStatus!
+    receipt: Receipt
+    location: String
+    review: SessionReview
+    googleCalendarEventId: String  # New field for Google Calendar OR calendly OR scheduling solution used
+}
+
+enum SessionStatus {
+    SCHEDULED
+    CANCELLED
+    COMPLETED
+}
+
+type Receipt {
+    id: ID!
+    stripeId: String!
+    amount: Float!
+    status: PaymentStatus!
+}
+
+enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+}
+
+type SessionReview {
+    id: ID!
+    session: CoachingSession!
+    text: String!
+    rating: Int!
+    createdAt: DateTime!
+}
+
+############################################
+# INPUTS
+############################################
+
+input UserInput {
+    userType: UserType!
+    email: String!
+    password: String
+    firstName: String
+    lastName: String
+    description: String
+    profilePictureUrl: String
+    tagsOfSpecialties: [String]
+    sessionAvailability: [DateTime]
+    sessionPrice: Float
+    preferredTimes: [DateTime]
+}
+
+input UserProfileInput {
+    firstName: String
+    lastName: String
+    description: String
+    profilePictureUrl: String
+    tagsOfSpecialties: [String]
+    sessionAvailability: [DateTime]
+    sessionPrice: Float
+    preferredTimes: [DateTime]
+}
+
+input SessionInput {
+    coachId: ID!
+    coacheeId: ID!
+    dateTime: DateTime!
+    location: String
+}
+
+scalar DateTime
+
+
+############################################
+# Queries
+############################################
+
+type Query {
+    getUser(email: String!): User
+    getSessionsForUser(userId: ID!): [Session]
+    getAllCoaches: [Coach]
+    getSessionDetails(sessionId: ID!): Session
+    getReceiptDetails(receiptId: ID!): Receipt
+}
+
+
+
+############################################
+# MUTATIONS
+############################################
+
+type Mutation {
+    signUpUser(newUser: UserInput!): User
+    updateUserProfile(userId: ID!, updatedProfile: UserProfileInput!): User
+    bookSession(sessionInput: SessionInput!): Session
+    cancelSession(sessionId: ID!): Session
+    submitReview(sessionId: ID!, review: String!, rating: Int!): Review
+}
+
