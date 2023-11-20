@@ -4,6 +4,9 @@ const {ApolloServer, UserInputError} = require('apollo-server-express');
 const {GraphQLScalarType} = require('graphql');
 const {Kind} = require('graphql/language');
 const {MongoClient} = require('mongodb');
+require("dotenv").config();
+const passport = require('passport');
+require('./passport')(passport);
 
 /******************************************* 
 DATABASE CONNECTION CODE
@@ -550,6 +553,28 @@ const server = new ApolloServer({
     }
 });
 server.applyMiddleware({app, path: '/graphql'});
+
+// Google OAuth routes
+// 1. Redirect user to Google login page
+app.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["email", "profile"] })
+);
+
+// 2. Get user data using access token
+app.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { session: false }),
+    (req, res) => {
+        res.redirect("/profile/");
+    }
+);
+
+// 3. Get profile after sign in success
+app.get("/profile", (req, res) => {
+    console.log(req);
+    res.send("Welcome");
+});
 
 // Starting the server that runs forever.
 (async function () {
