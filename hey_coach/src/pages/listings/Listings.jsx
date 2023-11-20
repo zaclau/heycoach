@@ -1,9 +1,8 @@
 import Footer from "../../components/footer/Footer";
 import ListingCard from "../../components/listingCard/ListingCard"
-import Navbar from "../../components/navbar/Navbar";
 import SearchBar from "../../components/searchBar/SearchBar";
 import Filter from "../../components/filter/Filter";
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { useNavigate } from "react-router";
 
 const topics = ["Health & Fitness", "Arts & Crafts", "Science & Tech", "Mental Health", "Food & Beverages"];
@@ -22,8 +21,7 @@ const Listings = () => {
     };
 
     return (
-      <div>
-        <Navbar />
+      <Fragment>
         <div className="container my-3">
           <SearchBar setSearchTerm={setSearchTerm} searchTerm={searchTerm} />
         </div>
@@ -55,7 +53,7 @@ const Listings = () => {
         </div>
         <ListingCard buttonDesc="View Profile" buttonAction={ () => navigate("/coaches/1") }/>
         <ListingCard buttonDesc="View Profile" buttonAction={ () => navigate("/coaches/1") }/>
-      </div>
+      </Fragment>
     );
   };
 
