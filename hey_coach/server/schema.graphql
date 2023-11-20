@@ -4,6 +4,8 @@
 # TYPES
 ############################################
 
+scalar DateTime  # referencing GraphQL Scalars package, https://the-guild.dev/graphql/scalars/docs/usage
+scalar LocalTime
 
 #################
 # PEOPLE objects 
@@ -21,14 +23,18 @@ type User{
     googleOuthToken: String
     stripeCustomerId: String
 
+    # LOGS
+    loggedCreatedAt: DateTime
+    loggedLogins: [DateTime]
+
     # FLAGS - used to init UI
     isCoach: Boolean
     isCoachee: Boolean
 }
 
-type PreferredTimeSlot {
-    start: String  # Format: "HH:mm"
-    end: String 
+type PreferredTimeSlot{
+    start: LocalTime  # Format: "HH:mm"
+    end: LocalTime
 }
 
 type PreferredDay {
@@ -58,7 +64,7 @@ enum SessionGoal {
 
 type ProfileOfCoachee {
     userId: ID!
-    sessionSlotsPreferred: [DaySchedule]
+    sessionSlotsPreferred: [PreferredDay]
     tagsOfGoals: [SessionGoal]! # can link to GPT3.5 or vector search later to match with coach type
 }
 
@@ -118,7 +124,7 @@ enum StatusOfPayment {
 # INPUTS
 ############################################
 
-input UserInput {
+input InputUser {
     email: String!
     password: String
     firstName: String!
@@ -127,41 +133,40 @@ input UserInput {
     profilePictureUrl: String
 }
 
-input CoachProfileInput {
+input InputCoachProfile {
     userId: ID!
     tagsOfSpecialties: [String]
-    sessionSlotsAvailable: [PreferredDayInput]
+    sessionSlotsAvailable: [InputPreferredDay]
     sessionDuration: Int
     sessionPrice: Float
 }
 
-input CoacheeProfileInput {
+input InputCoacheeProfile {
     userId: ID!
-    sessionSlotsPreferred: [PreferredDayInput]
+    sessionSlotsPreferred: [InputPreferredDay]
     sessionGoals: [SessionGoal]
 }
 
-input PreferredDayInput {
+input InputPreferredDay {
     day: String
-    slots: [PreferredTimeSlotInput]
+    slots: [InputPreferredTime]
 }
 
-input PreferredTimeSlotInput {
+input InputPreferredTime {
     start: String  # Format: "HH:mm"
     end: String
 }
 
-input SessionInput {
+input InputCoachSession {
     coachId: ID!
     coacheeId: ID!
-    dateTime: DateTime!
+    dateTime: DateTime! # using graphql-scalars
     location: String
 }
 
-
-input ReviewInput {
+input InputReview {
     id: ID!
-    session: CoachingSession!
+    session: InputCoachSession!
     text: String!
     rating: Int!
     createdAt: DateTime!
@@ -178,10 +183,10 @@ type Query {
     # User Queries
     ################
 
-    getUser(email: String!): User
+    getUserByEmail(email: String!): User
     getUserById(id: ID!): User
     getAllUsers: [User]
-    getSessionsForUser(userId: ID!): [Session]
+
 
     ################
     # Coach and Coachee Profile Queries
@@ -197,9 +202,10 @@ type Query {
     ################
 
     getCoachingSessionById(id: ID!): CoachingSession
-    getSessionsForCoach(coachId: ID!): [CoachingSession]
-    getSessionsForCoachee(coacheeId: ID!): [CoachingSession]
-    getSessionDetails(sessionId: ID!): Session
+    getAllSessionsForUser(userId: ID!): [CoachingSession]
+    getPastSessionsforUser(userId: ID!): [CoachingSession]
+    getNextSessionForUser(userId: ID!) : CoachingSession
+    getSessionDetails(sessionId: ID!): CoachingSession
     getReceiptDetails(receiptId: ID!): Receipt
 
     # Scheduling Queries
@@ -214,11 +220,11 @@ type Query {
 # MUTATIONS
 ############################################
 
-type Mutation {
-    signUpUser(newUser: UserInput!): User
-    updateUserProfile(userId: ID!, updatedProfile: UserProfileInput!): User
-    bookSession(sessionInput: SessionInput!): Session
-    cancelSession(sessionId: ID!): Session
-    submitReview(sessionId: ID!, review: String!, rating: Int!): Review
-}
-
+#type Mutation {
+#    signUpUser(newUser: UserInput!): User
+#    updateUserProfile(userId: ID!, updatedProfile: UserProfileInput!): User
+#    bookSession(sessionInput: SessionInput!): Session
+#    cancelSession(sessionId: ID!): Session
+#    submitReview(sessionId: ID!, review: String!, rating: Int!): Review
+#}
+#
