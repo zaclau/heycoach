@@ -12,7 +12,7 @@ scalar LocalTime
 #################
 
 type User{
-    id: ID! 
+    _id: ID!
     email: String!
     firstName: String!
     lastName: String
@@ -51,6 +51,8 @@ type ProfileOfCoach {
     sessionDuration: Int!
     sessionPrice: Float!
 
+    # TODO: add in average review score
+    # TODO: add in total sessions
 }
 
 enum SessionGoal {
@@ -73,7 +75,7 @@ type ProfileOfCoachee {
 ###############
 
 type CoachingSession {
-    id: ID!
+    _id: ID!
 
     # Participant References
     coachId: ID!           # Reference to the coach's ID
@@ -86,21 +88,22 @@ type CoachingSession {
     googleCalendarEventId: String # ID for the event in Google Calendar or other scheduling solutions
 
     # Financial Information
-    receipt: Receipt       # Receipt information for the session
+    receipt: [SessionReceipt]       # Receipt information for the session
 
     # Post-Session Review
-    review: SessionReview  # Review of the session (nullable, as it's post-session data)
+    review: [SessionReview]  # Review of the session (nullable, as it's post-session data)
 }
 
-type Receipt {
-    id: ID!
+type SessionReceipt {
+    _id: ID!
+    session: CoachingSession!
     stripeId: String!
     amount: Float!
     status: StatusOfPayment!
 }
 
 type SessionReview {
-    id: ID!
+    _id: ID!
     session: CoachingSession!
     text: String!
     rating: Int!
@@ -183,9 +186,11 @@ type Query {
     # User Queries
     ################
 
-    getUserByEmail(email: String!): User
-    getUserById(id: ID!): User
-    getAllUsers: [User]
+    getUserByEmail(email: String!): User  # implemented
+    getUserById(id: ID!): User  # implemented
+    getAllUsers: [User]  # implemented
+    getAllCoaches: [User]  # implemented
+    getAllCoachees: [User]  # implemented
 
 
     ################
@@ -201,12 +206,18 @@ type Query {
     # Session Queries
     ################
 
+    getAllSessions: [CoachingSession]
+    getAllReviews: [SessionReview]
+    getAllReceipts: [SessionReceipt]
+
     getCoachingSessionById(id: ID!): CoachingSession
-    getAllSessionsForUser(userId: ID!): [CoachingSession]
-    getPastSessionsforUser(userId: ID!): [CoachingSession]
-    getNextSessionForUser(userId: ID!) : CoachingSession
+
+    # by people
+    getAllSessionsForUser(userId: ID!): [CoachingSession]  # implemented
+
     getSessionDetails(sessionId: ID!): CoachingSession
-    getReceiptDetails(receiptId: ID!): Receipt
+    getReceiptDetails(receiptId: ID!): SessionReceipt
+    getReviewDetails(receiptId: ID!): SessionReceipt
 
     # Scheduling Queries
     # pending 

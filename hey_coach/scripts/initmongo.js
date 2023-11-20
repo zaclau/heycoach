@@ -1,9 +1,9 @@
 // initmongo.js
-  
+
 // To execute:
 // $mongosh heycoach initmongo.js
 // Above command to be executed from the directory where initmongo.js is present
-  
+
 db.dropDatabase();
 
 //############################################
@@ -12,84 +12,55 @@ db.dropDatabase();
 
 db.createCollection("users");
 
-var n_coaches = 100;
-var n_coachees = 120;
+let n_coaches = 20;
+let n_coachees = 20;
+var n_sessions = 10000;
 
-var coachIds = Array.from({length: n_coaches}, (_, i) => i + 1);
-var coacheeIds = Array.from({length: n_coachees}, (_, i) => i + n_coaches + 1);
-
-let userList = [];
-
-// Inserting coaches
-for (var i in coachIds) {
-    var id = coachIds[i];
-    userList.push({
-        id: id,
-        firstName: "CoachFirst" + id,
-        lastName: "CoachLast" + id,
-        description: "Loving life ❤️",
-        profilePictureUrl: "url" + id,
-        googleOuthToken: "googleToken" + id,
-        stripeCustomerId: "stripeID" + id,
-        isCoach: true,
-        isCoachee: false
-    });
-}
-
-// Inserting coachees
-for (var i in coacheeIds) {
-    var id = coacheeIds[i];
-    userList.push({
-        id: id,
-        firstName: "CoacheeFirst" + id,
-        lastName: "CoacheeLast" + id,
-        description: "Loving life ❤️",
-        profilePictureUrl: "url" + id,
-        googleOuthToken: "googleToken" + id,
-        stripeCustomerId: "stripeID" + id,
-        isCoach: false,
-        isCoachee: true
-    });
-}
-
-db.users.insertMany(userList);
-
-//############################################
-// PROFILES
-//############################################
-
-// Coaches Profiles
-db.createCollection("profilesOfCoaches");
 let coachProfiles = [];
-
-for (var i in coachIds) {
-    var id = coachIds[i];
-    coachProfiles.push({
-        userId: id,
-        coachText: "I'm a coach",
-        tagsOfSpecialties: ["Yoga", "Rock Climbing", "Qigong"],
-        sessionDuration: 60,
-        sessionPrice: 120.50
-    });
-}
-
-db.profilesOfCoaches.insertMany(coachProfiles);
-
-// Coachees Profiles
-db.createCollection("profilesOfCoachees");
 let coacheeProfiles = [];
 
-for (var i in coacheeIds) {
-    var id = coacheeIds[i];
-    coacheeProfiles.push({
-        userId: id,
-        tagsOfGoals: ["StrengthBuilding", "Wellness"]
-    });
+// Inserting coaches and coachees
+for (let i = 1; i <= n_coaches + n_coachees; i++) {
+    let isCoach = i <= n_coaches;
+    let user = {
+        email: "user" + i + "@gmail.com",
+        firstName: isCoach ? "CoachFirst" + i : "CoacheeFirst" + i,
+        lastName: isCoach ? "CoachLast" + i : "CoacheeLast" + i,
+        description: "Loving life ❤️",
+        profilePictureUrl: "url" + i,
+        googleOuthToken: "googleToken" + i,
+        stripeCustomerId: "stripeID" + i,
+        isCoach: isCoach,
+        isCoachee: !isCoach
+    };
+
+    let userId = db.users.insertOne(user).insertedId;
+
+    // Create corresponding profiles
+    if (isCoach) {
+        coachProfiles.push({
+            userId: userId,
+            coachText: "I'm a coach",
+            tagsOfSpecialties: ["Yoga", "Rock Climbing", "Qigong"],
+            sessionDuration: 60,
+            sessionPrice: 120.50
+        });
+    } else {
+        coacheeProfiles.push({
+            userId: userId,
+            tagsOfGoals: ["StrengthBuilding", "Wellness"]
+        });
+    }
 }
 
+// Insert coach and coachee profiles
+db.createCollection("profilesOfCoaches");
+db.profilesOfCoaches.insertMany(coachProfiles);
+
+db.createCollection("profilesOfCoachees");
 db.profilesOfCoachees.insertMany(coacheeProfiles);
 
-
+// ...previous code...
 
 //############################################
 // SESSIONS
@@ -99,8 +70,11 @@ db.createCollection("sessions");
 db.createCollection("receipts");
 db.createCollection("reviews");
 
-var n_sessions = 100;
 var sessionStatuses = ["SCHEDULED", "CANCELLED", "COMPLETED"];
+
+// Fetch Coach and Coachee IDs
+var coachIds = db.users.find({ isCoach: true }).toArray().map(user => user._id);
+var coacheeIds = db.users.find({ isCoachee: true }).toArray().map(user => user._id);
 
 for (let i = 0; i < n_sessions; i++) {
     // Randomly select a coach and a coachee
@@ -110,10 +84,9 @@ for (let i = 0; i < n_sessions; i++) {
 
     // Create a receipt and insert it
     let receipt = {
-        // Fill in receipt details
         stripeId: "stripe_" + i,
         amount: Math.random() * 100,
-        status: "PENDING" // Or another logic for status
+        status: "PENDING" // or another logic for status
     };
     let receiptId = db.receipts.insertOne(receipt).insertedId;
 

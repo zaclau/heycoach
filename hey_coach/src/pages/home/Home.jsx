@@ -3,14 +3,12 @@ import FeaturedCoaches from "../../components/featuredCoaches/FeaturedCoaches";
 import Footer from "../../components/footer/Footer";
 import Header from "../../components/header/Header";
 import Signup from "../../components/signup/Signup";
-import Navbar from "../../components/navbar/Navbar";
 import TopicList from "../../components/topicList/TopicList";
 import "./home.css";
 
 const Home = () => {
   return (
     <div>
-      <Navbar />
       <Header/>
       <div className="homeContainer">
         <Featured/>

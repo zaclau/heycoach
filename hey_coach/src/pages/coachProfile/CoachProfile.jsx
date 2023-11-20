@@ -1,9 +1,8 @@
-import Navbar from "../../components/navbar/Navbar";
+import { Fragment } from "react";
+import { useParams, useNavigate } from "react-router";
 import ListingCard from "../../components/listingCard/ListingCard"
-import { useParams } from "react-router";
 import SocialMediaCard from "../../components/socialMedia/SocialMediaCard";
 import ReviewComments from "../../components/reviewComments/ReviewComments";
-import { useNavigate } from "react-router";
 
 function CoachProfile() {
     const params = useParams();
@@ -11,8 +10,7 @@ function CoachProfile() {
 
     const navigate = useNavigate();
     return (
-        <div>
-            <Navbar />
+        <Fragment>
             <div className="container-xxl bd-gutter">
                 <ListingCard buttonDesc="Schedule a Session" buttonAction={() => navigate("/bookings")}/>
                 <hr></hr>
@@ -34,7 +32,7 @@ function CoachProfile() {
                     <ReviewComments />
                 </div>
             </div>
-        </div>
+        </Fragment>
     );
 }
 
