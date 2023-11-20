@@ -96,7 +96,7 @@ type CoachingSession {
 
 type SessionReceipt {
     _id: ID!
-    session: CoachingSession!
+    sessionId: ID!  # ID of related session
     stripeId: String!
     amount: Float!
     status: StatusOfPayment!
@@ -104,7 +104,7 @@ type SessionReceipt {
 
 type SessionReview {
     _id: ID!
-    session: CoachingSession!
+    sessionId: ID! # ID of related session
     text: String!
     rating: Int!
     createdAt: DateTime!
@@ -192,7 +192,6 @@ type Query {
     getAllCoaches: [User]  # implemented
     getAllCoachees: [User]  # implemented
 
-
     ################
     # Coach and Coachee Profile Queries
     ################
@@ -206,18 +205,16 @@ type Query {
     # Session Queries
     ################
 
-    getAllSessions: [CoachingSession]
-    getAllReviews: [SessionReview]
-    getAllReceipts: [SessionReceipt]
-
-    getCoachingSessionById(id: ID!): CoachingSession
+    getAllSessions: [CoachingSession]  # implemented
+    getAllReviews: [SessionReview]  # implemented
+    getAllReceipts: [SessionReceipt]  # implemented
+    getSessionById(sessionId: ID!): CoachingSession
+    getReceiptById(receiptId: ID!): SessionReceipt
+    getReviewById(receiptId: ID!): SessionReceipt
 
     # by people
     getAllSessionsForUser(userId: ID!): [CoachingSession]  # implemented
 
-    getSessionDetails(sessionId: ID!): CoachingSession
-    getReceiptDetails(receiptId: ID!): SessionReceipt
-    getReviewDetails(receiptId: ID!): SessionReceipt
 
     # Scheduling Queries
     # pending 
