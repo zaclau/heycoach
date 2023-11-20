@@ -7,16 +7,16 @@ module.exports = (passport) => {
         callbackURL: "http://localhost:3000/auth/google/callback",
         passReqToCallback : true
     }, 
-    async (request, accessToken, refresToken, profile, done) => {
-        try {
-            console.log('Google OAUTH success ✔');
-            console.log(profile);
-            return done(null, null);
-        } catch (error) {
-            console.log('Google OAUTH failed ❌')
-            console.log(error.message);
-            return done(null, null);
+        async (request, accessToken, refresToken, profile, done) => {
+            try {
+                console.log('Google OAUTH success ✔');
+                console.log(profile);
+                return done(null, null);
+            } catch (error) {
+                console.log('Google OAUTH failed ❌')
+                console.log(error.message);
+                return done(null, null);
+            }
         }
-    }
-    )
+    ));
 }

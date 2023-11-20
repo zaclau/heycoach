@@ -1,12 +1,12 @@
 import { useState, Fragment } from "react";
 import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/navbar/Navbar";
-import Home from "./pages/home/Home";
-import Listings from "./pages/listings/Listings";
-import Signup from "./pages/signup/Signup";
-import Login from "./pages/login/Login";
-import Bookings from "./pages/bookings/Bookings";
-import CoachProfile from "./pages/coachProfile/CoachProfile";
+import Navbar from "./components/navbar/Navbar.jsx";
+import Home from "./pages/home/Home.jsx";
+import Listings from "./pages/listings/Listings.jsx";
+import Signup from "./pages/signup/Signup.jsx";
+import Login from "./pages/login/Login.jsx";
+import Bookings from "./pages/bookings/Bookings.jsx";
+import CoachProfile from "./pages/coachProfile/CoachProfile.jsx";
 
 const NotFound = () => <h1>Page Not Found</h1>;
 
