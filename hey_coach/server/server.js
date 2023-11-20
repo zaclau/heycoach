@@ -58,8 +58,6 @@ const resolvers = {
 
         // Sessions
         getAllSessions: getAllSessionsResolver,
-        getAllReviews: getAllReviewsResolver,
-        getAllReceipts: getAllReceiptsResolver,
         getSessionById: getSessionByIdResolver,
         getAllSessionsForUser: getSessionsForUserResolver
     }
@@ -276,180 +274,63 @@ async function getAllCoacheesResolver(_, args) {
 async function getAllSessionsResolver(_) {
     try {
         const sessions = await db.collection('sessions').find().toArray();
-
-        // Enhance each session with its related receipts and reviews
-        const enhancedSessions = await Promise.all(sessions.map(async (session) => {
-            // Fetch receipts and reviews related to the session
-            const [receipts, reviews] = await Promise.all([
-                db.collection('receipts').find({ sessionId: session._id }).toArray(),
-                db.collection('reviews').find({ sessionId: session._id }).toArray()
-            ]);
-
-            return {
-                ...session,
-                receipt: receipts,
-                review: reviews,
-            };
+        return sessions.map(session => ({
+            ...session,
+            _id: session._id.toString(),
+            coachId: session.coachId.toString(),
+            coacheeId: session.coacheeId.toString(),
+            receipt: session.receipt.map(r => ({ ...r, _id: r._id.toString() })),
+            review: session.review ? { ...session.review, _id: session.review._id.toString() } : null,
         }));
-
-        return enhancedSessions;
     } catch (error) {
-        console.error(`Error in getAllSessionsResolver: ${error.message}`);
         throw new Error(`Error Thrown: ${error.message}`);
     }
 }
 
-async function getAllReviewsResolver(_) {
+async function getSessionByIdResolver(_, { sessionId }) {
+    if (!sessionId) throw new Error("sessionId is required");
+
     try {
-        const reviews = await db.collection('reviews').find().toArray();
-        return reviews;
-    } catch (error) {
-        console.error(`Error in getAllReviewsResolver: ${error.message}`);
-        throw new Error(`Error Thrown: ${error.message}`);
-    }
-}
-
-async function getAllReceiptsResolver(_) {
-    try {
-        const receipts = await db.collection('receipts').find().toArray();
-        return receipts;
-    } catch (error) {
-        console.error(`Error in getAllReceiptsResolver: ${error.message}`);
-        throw new Error(`Error Thrown: ${error.message}`);
-    }
-}
-
-async function getSessionByIdResolver(_, args) {
-    try {
-        const { sessionId } = args
-        console.log('Received ID:', sessionId); // Debugging log
-
-        if (!sessionId) {
-            throw new Error("sessionId is required")
-        }
-
         const sessionObjectId = new ObjectId(sessionId);
         const session = await db.collection('sessions').findOne({ _id: sessionObjectId });
-        console.log('Found Session:', session); // Debugging log
 
-        if (!session) {
-            console.log('No session found with ID:', args.id); // Debugging log
-            return null;
-        }
-
-        const [receipts, reviews] = await Promise.all([
-            db.collection('receipts').find({ sessionId: sessionObjectId }).toArray(),
-            db.collection('reviews').find({ sessionId: sessionObjectId }).toArray()
-        ]);
-
-        console.log('Receipts:', receipts); // Debugging log
-        console.log('Reviews:', reviews); // Debugging log
+        if (!session) return null;
 
         return {
             ...session,
             _id: session._id.toString(),
             coachId: session.coachId.toString(),
             coacheeId: session.coacheeId.toString(),
-            receipt: receipts,
-            review: reviews
+            receipt: session.receipt.map(r => ({ ...r, _id: r._id.toString() })),
+            review: session.review ? { ...session.review, _id: session.review._id.toString() } : null,
         };
     } catch (error) {
-        console.error(`Error in getSessionById: ${error.message}`);
         throw new Error(`Error Thrown: ${error.message}`);
     }
 }
 
+async function getSessionsForUserResolver(_, { userId }) {
+    if (!userId) throw new Error("UserId is required");
 
-// async function getSessionByIdResolver(_, args) {
-//     try {
-//         const { id } = args;  // ID of the session
-//         const sessionObjectId = new ObjectId(id);
-//         const session = await db.collection('sessions').findOne({ _id: sessionObjectId });
-//
-//         if (!session) {
-//             return null;
-//         }
-//
-//         // Fetch related receipts and reviews
-//         const [receipts, reviews] = await Promise.all([
-//             db.collection('receipts').find({ sessionId: sessionObjectId }).toArray(),
-//             db.collection('reviews').find({ sessionId: sessionObjectId }).toArray()
-//         ]);
-//
-//         return {
-//             ...session,
-//             _id: session._id.toString(),
-//             coachId: session.coachId.toString(),
-//             coacheeId: session.coacheeId.toString(),
-//             receipt: receipts.map(receipt => ({
-//                 ...receipt,
-//                 _id: receipt._id.toString(),
-//                 sessionId: receipt.sessionId.toString() // Convert sessionId to string if it's an ObjectId
-//             })),
-//             review: reviews.map(review => ({
-//                 ...review,
-//                 _id: review._id.toString(),
-//                 sessionId: review.sessionId.toString() // Convert sessionId to string if it's an ObjectId
-//             }))
-//         };
-//     } catch (error) {
-//         console.error(`Error in getSessionById: ${error.message}`);
-//         throw new Error(`Error Thrown: ${error.message}`);
-//     }
-// }
-
-async function getSessionsForUserResolver(_, args) {
-    /**
-     Resolver for fetching all sessions associated with a specific user. Returns reviews and receipts as object arrays
-
-     Description:
-     This resolver handles the query to fetch all coaching sessions where the specified user
-     is either the coach or the coachee. It retrieves sessions from the 'sessions' collection
-     and enhances each session with related receipts and reviews from their respective collections.
-
-     Schema:
-     type Query {
-         getSessionsForUser(userId: ID!): [CoachingSession]
-     }
-
-     Parameters:
-     - userId (ID!): The unique identifier of the user (coach or coachee) for whom the sessions are to be retrieved.
-     **/
     try {
-        // Process Inputs
-        const { userId } = args;
-        if (!userId) {
-            throw new Error("UserId is required");
-        }
-
-        // Convert userId to ObjectId
         const userIdObj = new ObjectId(userId);
-
         const query = { $or: [{ coachId: userIdObj }, { coacheeId: userIdObj }] };
         const sessions = await db.collection('sessions').find(query).toArray();
 
-        // Enhance each session with its related receipts and reviews
-        const enhancedSessions = await Promise.all(sessions.map(async (session) => {
-            // Fetch receipts related to the session
-            const receipts = await db.collection('receipts').find({ sessionId: session._id }).toArray();
-
-            // Fetch reviews related to the session
-            const reviews = await db.collection('reviews').find({ sessionId: session._id }).toArray();
-
-            return {
-                ...session,
-                receipt: receipts,
-                review: reviews
-            };
+        return sessions.map(session => ({
+            ...session,
+            _id: session._id.toString(),
+            coachId: session.coachId.toString(),
+            coacheeId: session.coacheeId.toString(),
+            receipt: session.receipt.map(r => ({ ...r, _id: r._id.toString() })),
+            review: session.review ? { ...session.review, _id: session.review._id.toString() } : null,
         }));
-
-        return enhancedSessions;
-
     } catch (error) {
-        console.error(`Error in getSessionsForUserResolver: ${error.message}`);
         throw new Error(`Error Thrown: ${error.message}`);
     }
 }
+
+
 
 /*******************************************
 SERVER INITIALIZATION CODE
