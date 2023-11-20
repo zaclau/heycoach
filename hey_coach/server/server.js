@@ -5,8 +5,6 @@ const {GraphQLScalarType} = require('graphql');
 const {Kind} = require('graphql/language');
 const {MongoClient} = require('mongodb');
 require("dotenv").config();
-const passport = require('passport');
-require('./passport')(passport);
 
 // Import graphql scalars
 const { DateTimeResolver } = require('graphql-scalars');
@@ -82,6 +80,8 @@ const server = new ApolloServer({
     }
 });
 
+const passport = require('passport');
+require('./passport')(passport);
 // Google OAuth routes
 // 1. Redirect user to Google login page
 app.get(
@@ -94,13 +94,15 @@ app.get(
     "/auth/google/callback",
     passport.authenticate("google", { session: false }),
     (req, res) => {
+        console.log('google callback route called');
+        console.log(req.body);
         res.redirect("/profile/");
     }
 );
 
 // 3. Get profile after sign in success
 app.get("/profile", (req, res) => {
-    console.log(req);
+    // console.log(req);
     res.send("Welcome");
 });
 
