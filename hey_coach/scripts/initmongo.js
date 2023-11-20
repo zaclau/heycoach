@@ -4,9 +4,10 @@
 // $mongosh heycoach initmongo.js
 // Above command to be executed from the directory where initmongo.js is present
 
+const faker = require('@faker-js/faker').faker;
 let db;
 
-db.dropDatabase();
+db.dropDatabase()
 
 //############################################
 // USERS
@@ -14,59 +15,36 @@ db.dropDatabase();
 
 db.createCollection("users");
 
-let n_coaches = 20;
-let n_coachees = 20;
-var n_sessions = 1000;
+let n_users = 100; // Total number of users
+let n_sessions = 1000;
 
-let coachProfiles = [];
-let coacheeProfiles = [];
-
-// Inserting coaches and coachees
-for (let i = 1; i <= n_coaches + n_coachees; i++) {
-    let isCoach = i <= n_coaches;
+for (let i = 1; i <= n_users; i++) {
     let user = {
-        email: "user" + i + "@gmail.com",
-        firstName: isCoach ? "CoachFirst" + i : "CoacheeFirst" + i,
-        lastName: isCoach ? "CoachLast" + i : "CoacheeLast" + i,
-        description: "Loving life ❤️",
-        profilePictureUrl: "url" + i,
-        googleOuthToken: "googleToken" + i,
-        stripeCustomerId: "stripeID" + i,
-        isCoach: isCoach,
-        isCoachee: !isCoach
+        email: faker.internet.email(),
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
+        profilePictureUrl: faker.image.urlLoremFlickr({
+            category: "portrait",
+            height: 300,
+            width: 300
+        }),
+        googleOuthToken: "googleToken_" + i,
+        stripeCustomerId: "stripeID_" + i,
+        profileAsCoach: i % 2 === 0 ? {
+            description: faker.lorem.paragraph(),
+            tagsOfSpecialties: faker.lorem.words(3).split(' '),
+            sessionDuration: faker.number.int({ min: 30, max: 120 }),
+            sessionPrice: faker.commerce.price()
+        } : null,
+        profileAsCoachee: i % 2 !== 0 ? {
+            description: faker.lorem.paragraph(),
+            tagsOfGoals: ["StrengthBuilding", "Wellness"]
+        } : null
     };
 
-    let userId = db.users.insertOne(user).insertedId;
-
-    // Create corresponding profiles
-    if (isCoach) {
-        coachProfiles.push({
-            userId: userId,
-            coachText: "I'm a coach",
-            tagsOfSpecialties: ["Yoga", "Rock Climbing", "Qigong"],
-            sessionDuration: 60,
-            sessionPrice: 120.50
-        });
-    } else {
-        coacheeProfiles.push({
-            userId: userId,
-            tagsOfGoals: ["StrengthBuilding", "Wellness"]
-        });
-    }
+    db.users.insertOne(user);
 }
 
-// Insert coach and coachee profiles
-db.createCollection("profilesOfCoaches");
-db.profilesOfCoaches.insertMany(coachProfiles);
-
-db.createCollection("profilesOfCoachees");
-db.profilesOfCoachees.insertMany(coacheeProfiles);
-
-// ...previous code...
-
-//############################################
-// SESSIONS
-//############################################
 
 //############################################
 // SESSIONS
