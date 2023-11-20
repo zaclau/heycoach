@@ -5,6 +5,7 @@ const {GraphQLScalarType} = require('graphql');
 const {Kind} = require('graphql/language');
 const {MongoClient, ObjectId} = require('mongodb');
 require("dotenv").config();
+console.log(process.env.CLIENT_ID);
 
 // Import graphql scalars
 const { DateTimeResolver } = require('graphql-scalars');
