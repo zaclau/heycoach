@@ -14,7 +14,7 @@ let db;
 
 // Function to connect to the database
 async function connectToDb() {
-    const url = 'mongodb://localhost/assignment3db';
+    const url = 'mongodb://localhost/heycoach';
     const client = new MongoClient(url, {useNewUrlParser: true});
     await client.connect();
     console.log('Connected to MongoDB at', url);
