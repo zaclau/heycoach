@@ -4,6 +4,9 @@ const {ApolloServer, UserInputError} = require('apollo-server-express');
 const {GraphQLScalarType} = require('graphql');
 const {Kind} = require('graphql/language');
 const {MongoClient} = require('mongodb');
+require("dotenv").config();
+const passport = require('passport');
+require('./passport')(passport);
 
 // Import graphql scalars
 const { DateTimeResolver } = require('graphql-scalars');
@@ -61,10 +64,6 @@ async function getSessionsForUserResolver(_, args){
 async function getPastSessionsForUserResolver(_, args){
 }
 
-/******************************************* 
-SERVER INITIALIZATION CODE
-********************************************/
-
 /*******************************************
 SERVER INITIALIZATION CODE
 ********************************************/
@@ -81,6 +80,28 @@ const server = new ApolloServer({
         console.log(error);
         return error;
     }
+});
+
+// Google OAuth routes
+// 1. Redirect user to Google login page
+app.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["email", "profile"] })
+);
+
+// 2. Get user data using access token
+app.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { session: false }),
+    (req, res) => {
+        res.redirect("/profile/");
+    }
+);
+
+// 3. Get profile after sign in success
+app.get("/profile", (req, res) => {
+    console.log(req);
+    res.send("Welcome");
 });
 
 // Start the Apollo Server before applying middleware
