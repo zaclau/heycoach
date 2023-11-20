@@ -1,13 +1,20 @@
-const fs = require('fs');
-const express = require('express');
-const {ApolloServer, UserInputError} = require('apollo-server-express');
-const {GraphQLScalarType} = require('graphql');
-const {Kind} = require('graphql/language');
-const {MongoClient, ObjectId} = require('mongodb');
+// Environment Variables
 require("dotenv").config();
 console.log(process.env.CLIENT_ID);
 
-// Import graphql scalars
+// Core Node Modules
+const fs = require('fs');
+const express = require('express');
+
+// Apollo Server and GraphQL Modules
+const { ApolloServer, UserInputError } = require('apollo-server-express');
+const { GraphQLScalarType } = require('graphql');
+const { Kind } = require('graphql/language');
+
+// MongoDB Modules
+const { MongoClient, ObjectId } = require('mongodb');
+
+// Custom Scalars (GraphQL)
 const { DateTimeResolver } = require('graphql-scalars');
 
 /******************************************* 
@@ -62,14 +69,15 @@ const resolvers = {
     Mutation: {
         // User Mutations
         signUpUser: signUpUserResolver,
-        updateUserProfile: updateUserProfileResolver,
+        // updateUserProfile: updateUserProfileResolver,
+        // TODO create seperate profile update mutations
 
         // Session Mutations
-        createSession: createSessionResolver,
-        cancelSession: cancelSessionResolver,
+        // createSession: createSessionResolver,
+        // cancelSession: cancelSessionResolver,
 
         // Review Mutation
-        submitReview: submitReviewResolver
+        // submitReview: submitReviewResolver
     }
 }
 
@@ -220,12 +228,10 @@ async function signUpUserResolver(_, args) {
 }
 
 
+// /*******************************************
+// SERVER INITIALIZATION CODE
+// ********************************************/
 
-
-
-/*******************************************
-SERVER INITIALIZATION CODE
-********************************************/
 const app = express();
 
 // Attaching a Static web server.
