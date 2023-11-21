@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import { DialogContent, DialogOverlay } from "@reach/dialog";
 import "./filtermodal.css";
 

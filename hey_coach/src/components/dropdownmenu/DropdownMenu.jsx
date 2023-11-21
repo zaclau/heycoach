@@ -1,3 +1,4 @@
+import React from 'react';
 import { ReactComponent as CogIcon } from '../../icons/cog.svg';
 import { ReactComponent as ChevronIcon } from '../../icons/chevron.svg';
 import { ReactComponent as ArrowIcon } from '../../icons/arrow.svg';

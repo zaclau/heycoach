@@ -1,3 +1,4 @@
+import React from 'react';
 import Footer from "../../components/footer/Footer";
 import ListingCard from "../../components/listingCard/ListingCard"
 import SearchBar from "../../components/searchBar/SearchBar";

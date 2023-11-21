@@ -1,3 +1,4 @@
+import React from 'react';
 function SocialMediaCard() {
     return (
         <div className="p-2 w-25">

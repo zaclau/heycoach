@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import React from 'react';import { Fragment } from "react";
 import { useParams, useNavigate } from "react-router";
 import ListingCard from "../../components/listingCard/ListingCard"
 import SocialMediaCard from "../../components/socialMedia/SocialMediaCard";

@@ -27,12 +27,6 @@ module.exports = {
       },
     ],
   },
-  optimization: {
-    splitChunks: {
-      name: 'vendor',
-      chunks: 'all',
-    },
-  },
   resolve: {
     extensions: ['', '.js', '.jsx'],
   },
