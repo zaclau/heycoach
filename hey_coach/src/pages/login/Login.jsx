@@ -4,12 +4,14 @@ import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import { useGoogleLogin } from '@react-oauth/google';
 import { graphQLFetch } from "../../graphQL/graphQLFetch";
 import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../../auth/auth';
 
-function Login({ userManagement }) {
+function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     
     const navigate = useNavigate();
 
+    const userManagement = useAuthContext();
     const login = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -63,8 +65,8 @@ function Login({ userManagement }) {
             
 
             // Redirect to Listings page if existing user
-            if (existingUser) {
-                userManagement.signInUser(existingUser);    // Start user session
+            if (existingUser.getUserByEmail) {
+                userManagement.signInUser(existingUser.getUserByEmail);    // Start user session
                 navigate("/listings");
                 return;
             }
@@ -88,33 +90,7 @@ function Login({ userManagement }) {
             </h1>
 
             <div className="row justify-content-center">
-                <form onSubmit={handleSubmit((data) => {
-                        console.log(data)   // TODO: Replace with backend call to login endpoint
-                    })} className="col-4">
-
-                    <label className="form-label mt-2 mb-1">Email</label>
-                    <input {...register("email", {
-                        required: 'Email is required.', 
-                        pattern: {
-                            value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
-                            message: "Email is invalid."
-                        }
-                    })} 
-                        className="form-control text-white bg-dark rounded-pill" 
-                        placeholder="Email"></input>
-                    {errors.email && <ErrorMessage message={errors.email?.message} />}
-                    
-                    <label className="form-label mt-2 mb-1">Password</label>
-                    <input {...register("password", {
-                        required: 'Password is required.',
-                    })} className="form-control text-white bg-dark rounded-pill" placeholder="Password"></input>
-                    {errors.password && <ErrorMessage message={errors.password?.message} />}
-                    
-                    <input type="submit" value="Login" className="form-control btn btn-light mt-4"/>
-
-                    <button onClick={() => login()} className="form-control btn btn-light mt-4">Sign in with Google</button>
-                </form>
-                
+                <button onClick={() => login()} className="form-control btn btn-light mt-4 col-4">Sign in with Google</button>
             </div>
         </div>
     )

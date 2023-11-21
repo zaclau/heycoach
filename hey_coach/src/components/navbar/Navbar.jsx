@@ -1,19 +1,22 @@
 // import "./navbar.css"
 import React from 'react';
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from '../../auth/auth';
 
 const Navbar = () => {
+  const userManagement = useAuthContext();
   const navigate = useNavigate();
   const goHome = () => {
     navigate("/");
   }
 
-  const goSignup = () => {
-    navigate("/signup");
-  }
-
   const goLogin = () => {
     navigate("/login");
+  }
+
+  const goLogout = () => {
+    userManagement.signOutUser();
+    navigate("/");
   }
 
   return (
@@ -28,8 +31,10 @@ const Navbar = () => {
                 HeyCoach!
             </a>
             <div className="navItems">
-                <button className="btn btn-link link-dark fw-bold" onClick={ goLogin }>Login</button>
-                <button className="btn btn-link link-dark fw-bold" onClick={ goSignup }>Sign Up</button>
+                {userManagement && userManagement.userStore 
+                    ? <button className="btn btn-link link-dark fw-bold" onClick={ goLogout }>Logout</button>
+                    : <button className="btn btn-link link-dark fw-bold" onClick={ goLogin }>Login/Signup with Google</button>
+                }
             </div>
         </div>
     </div>
