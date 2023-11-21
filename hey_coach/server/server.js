@@ -1,10 +1,14 @@
+// Core Node Modules
 const fs = require('fs');
 const express = require('express');
-const {ApolloServer, UserInputError} = require('apollo-server-express');
-const {GraphQLScalarType} = require('graphql');
-const {Kind} = require('graphql/language');
-const {MongoClient, ObjectId} = require('mongodb');
 
+// Apollo Server and GraphQL Modules
+const { ApolloServer, UserInputError } = require('apollo-server-express');
+const { GraphQLScalarType } = require('graphql');
+const { Kind } = require('graphql/language');
+
+// MongoDB Modules
+const { MongoClient, ObjectId } = require('mongodb');
 
 // Custom Scalars (GraphQL)
 const { DateTimeResolver } = require('graphql-scalars');
@@ -61,12 +65,11 @@ const resolvers = {
     Mutation: {
         // User Mutations
         signUpUser: signUpUserResolver,
-        // updateUserProfile: updateUserProfileResolver,
-        // TODO create seperate profile update mutations
+        updateUserProfile: updateUserProfileResolver,
 
         // Session Mutations
-        // createSession: createSessionResolver,
-        // cancelSession: cancelSessionResolver,
+        createNewSession: createSessionResolver,
+        updateExistingSession: updateSessionResolver,
 
         // Review Mutation
         // submitReview: submitReviewResolver
@@ -160,7 +163,7 @@ async function getSessionByIdResolver(_, { sessionId }) {
             _id: session._id.toString(),
             coachId: session.coachId.toString(),
             coacheeId: session.coacheeId.toString(),
-            receipt: session.receipt.map(r => ({ ...r, _id: r._id.toString() })),
+            receipt: session.receipt,
             review: session.review ? { ...session.review, _id: session.review._id.toString() } : null,
         };
     } catch (error) {
@@ -202,7 +205,7 @@ async function signUpUserResolver(_, args) {
             email: newUser.email,
             firstName: newUser.firstName,
             lastName: newUser.lastName,
-            profilePictureUrl: newUser.profilePictureUrl,
+            profilePicture: newUser.profilePicture,
         };
 
         // Insert the new user into the database
@@ -219,10 +222,114 @@ async function signUpUserResolver(_, args) {
     }
 }
 
+async function updateUserProfileResolver(_, args) {
+    try {
+        // Correctly destructure 'updatedProfile' from args
+        const { userId, updatedProfile } = args;
 
-// /*******************************************
+        console.log('Received args:', args); // Debugging log
+        console.log('Received updatedProfile:', updatedProfile); // Debugging log
+
+        let updateDocument = {};
+
+        // Iterate over updatedProfile to build updateDocument
+        for (const key in updatedProfile) {
+            console.log(`Processing key: ${key}`); // Debugging log
+            if (updatedProfile[key] !== undefined) {
+                if (key === 'profileAsCoach' || key === 'profileAsCoachee') {
+                    for (const nestedKey in updatedProfile[key]) {
+                        console.log(`Processing nested key: ${nestedKey}`); // Debugging log
+                        updateDocument[`${key}.${nestedKey}`] = updatedProfile[key][nestedKey];
+                    }
+                } else {
+                    updateDocument[key] = updatedProfile[key];
+                }
+            }
+        }
+
+        console.log('Update document:', updateDocument); // Debugging log
+
+        // Perform the update operation in the database
+        await db.collection('users').updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: updateDocument }
+        );
+
+        // Retrieve and return the updated user data
+        const updatedUser = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+        return updatedUser;
+
+    } catch (error) {
+        console.error(`Error in updateUserProfile: ${error.message}`);
+        throw new Error(`Error Thrown: ${error.message}`);
+    }
+}
+
+async function createSessionResolver(_, args) {
+    try {
+        const { newSession } = args;
+
+        // Insert the new session into the database
+        const result = await db.collection('sessions').insertOne(newSession);
+
+        // Return the created session object
+        return {
+            _id: result.insertedId,
+            ...newSession,
+        };
+
+    } catch (error) {
+        console.error(`Error in createSession: ${error.message}`);
+        throw new Error(`Error Thrown: ${error.message}`);
+    }
+}
+
+async function updateSessionResolver(_, args) {
+    try {
+        // Correctly destructure 'updatedProfile' from args
+        const { sessionId, updatedSessionDetails } = args;
+
+        console.log('Received args:', args); // Debugging log
+        console.log('Received updatedProfile:', updatedSessionDetails); // Debugging log
+
+        let updateDocument = {};
+
+        // Iterate over updatedProfile to build updateDocument
+        for (const key in updatedSessionDetails) {
+            console.log(`Processing key: ${key}`); // Debugging log
+            if (updatedSessionDetails[key] !== undefined) {
+                if (key === 'receipt' || key === 'review') {
+                    for (const nestedKey in updatedSessionDetails[key]) {
+                        console.log(`Processing nested key: ${nestedKey}`); // Debugging log
+                        updateDocument[`${key}.${nestedKey}`] = updatedSessionDetails[key][nestedKey];
+                    }
+                } else {
+                    updateDocument[key] = updatedSessionDetails[key];
+                }
+            }
+        }
+
+        console.log('Update document:', updateDocument); // Debugging log
+
+        // Perform the update operation in the database
+        await db.collection('sessions').updateOne(
+            { _id: new ObjectId(sessionId) },
+            { $set: updateDocument }
+        );
+
+        // Retrieve and return the updated user data
+        const updatedUser = await db.collection('sessions').findOne({ _id: new ObjectId(sessionId) });
+        return updatedUser;
+
+    } catch (error) {
+        console.error(`Error in updateUserProfile: ${error.message}`);
+        throw new Error(`Error Thrown: ${error.message}`);
+    }
+}
+
+// ############################################
 // SERVER INITIALIZATION CODE
-// ********************************************/
+// ############################################
 
 const app = express();
 
