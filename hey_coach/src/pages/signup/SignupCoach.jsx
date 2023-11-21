@@ -54,23 +54,23 @@ function SignupCoach({ userManagement }) {
         const lastName = location.state.lastName;
         const profilePicture = location.state.profilePicture;
         const description = data.description;
-        const sessionDuration = data.sessionDuration;
-        const sessionPrice = data.sessionPrice;
+        const sessionDuration = parseInt(data.sessionDuration);
+        const sessionPrice = parseFloat(data.sessionPrice);
         const userProfileInput = {
-            email,
+            newUser: {email,
             firstName,
-            // lastName,
-            // profilePicture,
-            // profileAsCoach: {
-            //     description,
-            //     sessionDuration,
-            //     sessionPrice
-            // },
-            // profileAsCoachee: {}
+            lastName,
+            profilePicture,
+            profileAsCoach: {
+                description,
+                sessionDuration,
+                sessionPrice
+            }}
         };
+        console.log(userProfileInput);
 
         try {
-            const newUser = await graphQLFetch(signUpUserMutation, { userProfileInput });
+            const newUser = await graphQLFetch(signUpUserMutation, userProfileInput);
             console.log('New user created from Signup Coach: ', newUser);
             if (newUser) {
                 userManagement.signInUser(newUser);    // Start user session

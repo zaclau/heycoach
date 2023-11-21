@@ -66,9 +66,11 @@ function Login({ userManagement }) {
             if (existingUser) {
                 userManagement.signInUser(existingUser);    // Start user session
                 navigate("/listings");
+                return;
             }
 
             // Redirect to signup form
+            console.log('Navigating to signup page from login');
             navigate("/signup", { state: { 
                 email: userInfo.email, 
                 firstName: userInfo.given_name,
