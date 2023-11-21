@@ -14,9 +14,11 @@ scalar LocalTime
 type User{
     "User ID"
     _id: ID!
-    "email a string"
+    "Email a string"
     email: String!
+    "First Name"
     firstName: String!
+    "Last Name"
     lastName: String
     "BSON object of image"
     profilePicture: String # currently URL.
@@ -27,9 +29,9 @@ type User{
     googleOuthToken: String
     stripeCustomerId: String
 
-    # LOGS
-    "timestamp for datetime"
-    loggedCreatedAt: DateTime
+#    # LOGS
+#    "Timestamp for datetime"
+#    loggedCreatedAt: DateTime
 
     # Profiles
     "Profiles. Used for cards, etc"
@@ -108,7 +110,7 @@ type Receipt {
 type Review {
     text: String!
     rating: Int!
-    createdAt: DateTime!
+    createdAt: DateTime
 }
 
 enum StatusOfSession {
@@ -130,11 +132,9 @@ enum StatusOfPayment {
 
 input InputsForUserProfile {
     email: String!
-    password: String
     firstName: String!
     lastName: String
-    description: String
-    profilePictureUrl: String
+    profilePicture: String
     profileAsCoach: InputCoachProfile
     profileAsCoachee: InputCoacheeProfile
 }
@@ -167,17 +167,23 @@ input InputCoachSession {
     coachId: ID!
     coacheeId: ID!
     dateTime: DateTime! # using graphql-scalars
+    status: StatusOfSession!
     location: String
+    review: InputReview
+    receipt: [InputReceipt]
 }
 
 input InputReview {
-    id: ID!
-    session: InputCoachSession!
     text: String!
     rating: Int!
-    createdAt: DateTime!
+    createdAt: DateTime
 }
 
+input InputReceipt {
+    stripeId: String!
+    amount: Float!
+    status: StatusOfPayment
+}
 
 ############################################
 # Queries
@@ -192,8 +198,8 @@ type Query {
     getUserByEmail(email: String!): User  # implemented
     getUserById(id: ID!): User  # implemented
     getAllUsers: [User]  # implemented
-    getAllCoaches: [User]  # implemented
-    getAllCoachees: [User]  # implemented
+    getAllCoaches: [User]  # implemented, tested
+    getAllCoachees: [User]  # implemented, tested
 
     ################
     # Session Queries
@@ -220,19 +226,24 @@ type Query {
 
 type Mutation {
     "Sign up a new user with basic information"
-    signUpUser(newUser: InputsForUserProfile!): User
+    signUpUser(newUser: InputsForUserProfile!): User  # implemented
 
     "Update the profile of an existing user"
-    updateUserProfile(userId: ID!, updatedProfile: InputsForUserProfile!): User
+    updateUserProfile(userId: ID!, updatedProfile: InputsForUserProfile!): User # implemented
 
     "Create a new coaching session"
-    createSession(newSession: InputCoachSession!): CoachingSession
+    createNewSession(newSession: InputCoachSession!): CoachingSession # implemented, tested
 
-    "Cancel an existing coaching session"
-    cancelSession(sessionId: ID!): CoachingSession
+    "Update a session: e.g. change time, cancel, etc"
+    updateExistingSession(sessionId: ID!, updatedSessionDetails: InputCoachSession): CoachingSession # implemented, tested
 
-    "Submit a review for a completed coaching session"
-    submitReview(sessionId: ID!, newReview: InputReview!): Review
+    ####################
+    # THINGS TO CONSIDER
+    ####################
+    # deleteEntireProfile(userId)
+    # deleteCoachProfile(userId)
+    # deleteCoacheeProfile(userId)
+
 }
 
 
