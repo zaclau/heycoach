@@ -6,12 +6,10 @@ This implementation ties SearchBar.jsx and Listings very closely together
 It allows for a dynamic search feature where the search results can be controlled via URL parameters,
 enabling deep linking and bookmarking of specific search states.
 
-// Implementation:
-
 handleSearchClick
 - uses navigate to update the URL based on search query
 
-useEffect hook is designed to:
+useEffect
  - respond to changes in the URL's query parameters,
  - extract the search parameter,
  - update the local state with this search term,
