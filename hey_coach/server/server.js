@@ -4,8 +4,6 @@ const {ApolloServer, UserInputError} = require('apollo-server-express');
 const {GraphQLScalarType} = require('graphql');
 const {Kind} = require('graphql/language');
 const {MongoClient, ObjectId} = require('mongodb');
-require("dotenv").config();
-console.log(process.env.CLIENT_ID);
 
 // Import graphql scalars
 const { DateTimeResolver } = require('graphql-scalars');
@@ -348,32 +346,6 @@ const server = new ApolloServer({
         console.log(error);
         return error;
     }
-});
-
-const passport = require('passport');
-require('./passport')(passport);
-// Google OAuth routes
-// 1. Redirect user to Google login page
-app.get(
-    "/auth/google",
-    passport.authenticate("google", { scope: ["email", "profile"] })
-);
-
-// 2. Get user data using access token
-app.get(
-    "/auth/google/callback",
-    passport.authenticate("google", { session: false }),
-    (req, res) => {
-        console.log('google callback route called');
-        console.log(req.body);
-        res.redirect("/profile/");
-    }
-);
-
-// 3. Get profile after sign in success
-app.get("/profile", (req, res) => {
-    // console.log(req);
-    res.send("Welcome");
 });
 
 
