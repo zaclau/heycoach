@@ -10,26 +10,31 @@ scalar LocalTime
 #################
 # PEOPLE objects 
 #################
-
+"Represents all users in the system. See profiles for flags"
 type User{
+    "User ID"
     _id: ID!
+    "email a string"
     email: String!
     firstName: String!
     lastName: String
-    profilePicture: String # TODO what is the type for images
+    "BSON object of image"
+    profilePicture: String # currently URL.
+    # TODO: implement as binData https://www.mongodb.com/community/forums/t/process-of-storing-images-in-mongodb/15093/2
+    # TODO: saving as string shows fine in DB but as Null in graphql
 
     # TOKENS
     googleOuthToken: String
     stripeCustomerId: String
 
     # LOGS
+    "timestamp for datetime"
     loggedCreatedAt: DateTime
 
-    # FLAGS - used to init UI
-    isCoach: Boolean
-    isCoachee: Boolean
-
     # Profiles
+    "Profiles. Used for cards, etc"
+    profileAsCoach: CoachProfile
+    profileAsCoachee: CoacheeProfile
 }
 
 type PreferredTimeSlot{
@@ -42,17 +47,17 @@ type PreferredDay {
     slots: [PreferredTimeSlot]
 }
 
-type ProfileOfCoach {
-    # Primary Key is ID, not object. This is for security.
-    userId: ID!
-    coachText: String!
+type CoachProfile {
+    "Description of the coach. Can be long text."
+    description: String!
+    "Freeform tag of specialities"
     tagsOfSpecialties: [String]
+    "Placeholder. Potentially removed with calendly"
     sessionSlotsAvailable: [PreferredDay]
+    "Default session duration"
     sessionDuration: Int!
+    "Default session price"
     sessionPrice: Float!
-
-    # TODO: add in average review score
-    # TODO: add in total sessions
 }
 
 enum SessionGoal {
@@ -64,8 +69,8 @@ enum SessionGoal {
     MentalFocus
 }
 
-type ProfileOfCoachee {
-    userId: ID!
+type CoacheeProfile {
+    description: String!
     sessionSlotsPreferred: [PreferredDay]
     tagsOfGoals: [SessionGoal]! # can link to GPT3.5 or vector search later to match with coach type
 }
@@ -123,17 +128,19 @@ enum StatusOfPayment {
 # INPUTS
 ############################################
 
-input InputUser {
+input InputsForUserProfile {
     email: String!
     password: String
     firstName: String!
     lastName: String
     description: String
     profilePictureUrl: String
+    profileAsCoach: InputCoachProfile
+    profileAsCoachee: InputCoacheeProfile
 }
 
 input InputCoachProfile {
-    userId: ID!
+    description: String
     tagsOfSpecialties: [String]
     sessionSlotsAvailable: [InputPreferredDay]
     sessionDuration: Int
@@ -141,9 +148,9 @@ input InputCoachProfile {
 }
 
 input InputCoacheeProfile {
-    userId: ID!
+    description: String
     sessionSlotsPreferred: [InputPreferredDay]
-    sessionGoals: [SessionGoal]
+    tagsOfGoals: [SessionGoal]
 }
 
 input InputPreferredDay {
@@ -189,34 +196,21 @@ type Query {
     getAllCoachees: [User]  # implemented
 
     ################
-    # Coach and Coachee Profile Queries
-    ################
-
-    getAllCoachProfiles: [ProfileOfCoach]
-    getAllCoacheeProfiles: [ProfileOfCoachee]
-    getCoachProfile(userId: ID!): ProfileOfCoach
-    getCoacheeProfile(userId: ID!): ProfileOfCoachee
-
-    ################
     # Session Queries
     ################
 
     getAllSessions: [CoachingSession]  # implemented
-#    getAllReviews: [Review]  # implemented - reomoved with new schema
-#    getAllReceipts: [Receipt]  # implemented - removed with new schema
     getSessionById(sessionId: ID!): CoachingSession
-#    getReceiptById(receiptId: ID!): Receipt  # removed with new schema
-#    getReviewById(receiptId: ID!): Receipt  # removed with new schema
-
-    # by people
     getAllSessionsForUser(userId: ID!): [CoachingSession]  # implemented
 
+    ################
+    # Deprecated
+    ################
 
-    # Scheduling Queries
-    # pending 
-
-    # Additional and Modified Queries as per your requirements
-    # pending
+#    getAllReceipts: [Receipt]  # implemented - removed with new schema
+#    getAllReviews: [Review]  # implemented - reomoved with new schema
+#    getReceiptById(receiptId: ID!): Receipt  # removed with new schema
+#    getReviewById(receiptId: ID!): Receipt  # removed with new schema
 }
 
 
@@ -224,11 +218,21 @@ type Query {
 # MUTATIONS
 ############################################
 
-#type Mutation {
-#    signUpUser(newUser: UserInput!): User
-#    updateUserProfile(userId: ID!, updatedProfile: UserProfileInput!): User
-#    bookSession(sessionInput: SessionInput!): Session
-#    cancelSession(sessionId: ID!): Session
-#    submitReview(sessionId: ID!, review: String!, rating: Int!): Review
-#}
-#
+type Mutation {
+    "Sign up a new user with basic information"
+    signUpUser(newUser: InputsForUserProfile!): User
+
+    "Update the profile of an existing user"
+    updateUserProfile(userId: ID!, updatedProfile: InputsForUserProfile!): User
+
+    "Create a new coaching session"
+    createSession(newSession: InputCoachSession!): CoachingSession
+
+    "Cancel an existing coaching session"
+    cancelSession(sessionId: ID!): CoachingSession
+
+    "Submit a review for a completed coaching session"
+    submitReview(sessionId: ID!, newReview: InputReview!): Review
+}
+
+

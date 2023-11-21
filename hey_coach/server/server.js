@@ -5,7 +5,19 @@ const {GraphQLScalarType} = require('graphql');
 const {Kind} = require('graphql/language');
 const {MongoClient, ObjectId} = require('mongodb');
 
-// Import graphql scalars
+// Core Node Modules
+const fs = require('fs');
+const express = require('express');
+
+// Apollo Server and GraphQL Modules
+const { ApolloServer, UserInputError } = require('apollo-server-express');
+const { GraphQLScalarType } = require('graphql');
+const { Kind } = require('graphql/language');
+
+// MongoDB Modules
+const { MongoClient, ObjectId } = require('mongodb');
+
+// Custom Scalars (GraphQL)
 const { DateTimeResolver } = require('graphql-scalars');
 
 /******************************************* 
@@ -44,226 +56,86 @@ const resolvers = {
     DateTime: DateTimeResolver,
 
     Query: {
-
-        // User
+        // User Queries
         getUserByEmail: getUserByEmailResolver,
         getUserById: getUserByIDResolver,
         getAllUsers: getAllUsersResolver,
         getAllCoaches: getAllCoachesResolver,
         getAllCoachees: getAllCoacheesResolver,
 
-        // Profile
-
-        // Sessions
+        // Session Queries
         getAllSessions: getAllSessionsResolver,
         getSessionById: getSessionByIdResolver,
         getAllSessionsForUser: getSessionsForUserResolver
+    },
+
+    Mutation: {
+        // User Mutations
+        signUpUser: signUpUserResolver,
+        // updateUserProfile: updateUserProfileResolver,
+        // TODO create seperate profile update mutations
+
+        // Session Mutations
+        // createSession: createSessionResolver,
+        // cancelSession: cancelSessionResolver,
+
+        // Review Mutation
+        // submitReview: submitReviewResolver
     }
 }
 
 
-/* ############################################
-# RESOLVERS
- ############################################ */
-
-async function genericResolverTemplate(_, args) {
-    /*
-    Description: Describe what this resolver does.
-
-    Schema:
-    type Query {
-        yourQueryName(arg1: Type, arg2: Type, ...): ReturnType
-    }
-
-    Parameters:
-    - arg1: Description of arg1
-    - arg2: Description of arg2
-    - ...
-
-    Returns: Description of what is returned
-    */
-
-    try {
-        // Process Inputs
-        console.log('Processing inputs...');
-        // const { arg1, arg2, ... } = args;
-        // Process and validate inputs as needed
-
-        // Database Query
-        console.log('Querying database...');
-        // const result = await db.collection('yourCollection').findOne({ yourQuery: arg1 });
-        // Perform database operations as required
-
-        // Process Result
-        console.log('Processing result...');
-        // Perform any required processing on the result
-
-        // Return Result
-        console.log('Returning result');
-        return result;
-
-    } catch (error) {
-        // Error Handling
-        console.error(`Error in resolver: ${error.message}`);
-        throw new Error(`Error Thrown: ${error.message}`);
-    }
-}
+// ############################################
+// # RESOLVERS, QUERIES
+// ############################################
 
 async function getUserByEmailResolver(_, args) {
-    /*
-    Get a user by his email address
-
-    Schema: ....
-    */
     try {
-        // Process Inputs
-        const {email} = args;
-        console.log(email);
-
-        // Query DB
-        const userObject = await db.collection('users').findOne({email: email});
-        console.log(userObject);
-
-        return userObject
-
+        const { email } = args;
+        const user = await db.collection('users').findOne({ email });
+        return user;
     } catch (error) {
-        throw new Error(`Error Thrown: ${error.message}`);
+        throw new Error(`Error in getUserByEmailResolver: ${error.message}`);
     }
 }
 
 async function getUserByIDResolver(_, args) {
-    /*
-    Description: Returns full user object based on ID
-
-    Schema:
-    type Query {
-        getUserByIDResolver(userId: ID): User
-    }
-
-    Parameters:
-    - userId: ID of the user
-    - ...
-
-    Returns: Full user type object
-    */
-
     try {
-        // Database Connection Check
-        console.log('Checking database connection in resolver...');
-        if (!db) {
-            throw new Error("Database connection not established");
-        }
-
-        // Process Inputs
-        console.log('Processing inputs...');
         const { userId } = args;
-
-        // Database Query
-        console.log('Querying database...');
-        const result = await db.collection('users').findOne({ id: userId });
-
-        // Return Result
-        console.log('Returning result');
-        return result; // Replace 'result' with the actual data to be returned
-
+        const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+        return user;
     } catch (error) {
-        // Error Handling
-        console.error(`Error in resolver: ${error.message}`);
-        throw new Error(`Error Thrown: ${error.message}`);
+        throw new Error(`Error in getUserByIDResolver: ${error.message}`);
     }
 }
 
-async function getAllUsersResolver(_, args) {
-    /*
-    Description: get all users as a list of objects.
-
-    Schema:
-    type Query {
-        getAllUsers(): [Users]
-    }
-
-    Returns: array containing all users as objects
-    */
-
+async function getAllUsersResolver() {
     try {
-        // Database Connection Check
-        console.log('Checking database connection in resolver...');
-        if (!db) {
-            throw new Error("Database connection not established");
-        }
-
-        // Process and validate inputs as needed
-
-        // Database Query
-        console.log('Querying database...');
-        const result = await db.collection('users').find().toArray();
-
-        // Return Result
-        console.log('Returning result');
-        return result;
-
+        const users = await db.collection('users').find().toArray();
+        return users;
     } catch (error) {
-        // Error Handling
-        console.error(`Error in resolver: ${error.message}`);
-        throw new Error(`Error Thrown: ${error.message}`);
+        throw new Error(`Error in getAllUsersResolver: ${error.message}`);
     }
 }
 
-async function getAllCoachesResolver(_, args) {
-    /*
-    Description: Get all users who are coaches.
-
-    Schema:
-    type Query {
-        getAllCoaches: [User]
-    }
-
-    Returns: Array containing all users who are coaches.
-    */
-
+async function getAllCoachesResolver() {
     try {
-        // Database Query for Coaches
-        console.log('Querying database for all coaches...');
-        const coaches = await db.collection('users').find({ isCoach: true }).toArray();
-
-        // Return Result
-        console.log('Returning result with total coaches:', coaches.length);
+        const coaches = await db.collection('users').find({ profileAsCoach: { $ne: null } }).toArray();
         return coaches;
-
     } catch (error) {
-        // Error Handling
-        console.error(`Error in getAllCoachesResolver: ${error.message}`);
-        throw new Error(`Error Thrown: ${error.message}`);
+        throw new Error(`Error in getAllCoachesResolver: ${error.message}`);
     }
 }
 
-async function getAllCoacheesResolver(_, args) {
-    /*
-    Description: Get all users who are coaches.
-
-    Schema:
-    type Query {
-        getAllCoaches: [User]
-    }
-
-    Returns: Array containing all users who are coaches.
-    */
-
+async function getAllCoacheesResolver() {
     try {
-        // Database Query for Coaches
-        console.log('Querying database for all coaches...');
-        const coaches = await db.collection('users').find({ isCoachee: true }).toArray();
-
-        // Return Result
-        console.log('Returning result with total coaches:', coaches.length);
-        return coaches;
-
+        const coachees = await db.collection('users').find({ profileAsCoachee: { $ne: null } }).toArray();
+        return coachees;
     } catch (error) {
-        // Error Handling
-        console.error(`Error in getAllCoachesResolver: ${error.message}`);
-        throw new Error(`Error Thrown: ${error.message}`);
+        throw new Error(`Error in getAllCoacheesResolver: ${error.message}`);
     }
 }
+
 
 //############################################
 // SESSION RESOLVERS
@@ -328,11 +200,41 @@ async function getSessionsForUserResolver(_, { userId }) {
     }
 }
 
+// ############################################
+// RESOLVERS, MUTATIONS
+// ############################################
+
+async function signUpUserResolver(_, args) {
+    try {
+        // Extract newUser details from the arguments
+        const { newUser } = args;
+
+        const userDocument = {
+            email: newUser.email,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            profilePictureUrl: newUser.profilePictureUrl,
+        };
+
+        // Insert the new user into the database
+        const result = await db.collection('users').insertOne(userDocument);
+
+        // Return the created user object, excluding sensitive fields like password
+        return {
+            _id: result.insertedId,
+            ...userDocument,
+        };
+    } catch (error) {
+        console.error(`Error in signUpUser: ${error.message}`);
+        throw new Error(`Error Thrown: ${error.message}`);
+    }
+}
 
 
-/*******************************************
-SERVER INITIALIZATION CODE
-********************************************/
+// /*******************************************
+// SERVER INITIALIZATION CODE
+// ********************************************/
+
 const app = express();
 
 // Attaching a Static web server.
