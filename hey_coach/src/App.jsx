@@ -5,7 +5,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
-  const clientId = process.env.REACT_APP_GAPI_CLIENT_ID;
+  // const clientId = process.env.REACT_APP_GAPI_CLIENT_ID;
+  const clientId = "453091724462-34n2nq33sgu268q1r22hmllr4g8fnp0s.apps.googleusercontent.com";
   return (
     <BrowserRouter>
       <GoogleOAuthProvider clientId={clientId}>
