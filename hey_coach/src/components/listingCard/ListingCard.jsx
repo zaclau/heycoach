@@ -14,7 +14,8 @@ const ListingCard = ({ firstName, lastName, description, price, profilePicture, 
                                 style={{ height: '150px' }} // Ensures the image takes up the desired height
                             />
                             <p></p>
-                            <h3 className="fw-semibold">${price.toFixed(2)}</h3>
+                            {/*<h3 className="fw-semibold">${price.toFixed(2)}</h3>*/}
+                            <h3 className="fw-semibold">${price}</h3>
                             <p className="text-muted">/session</p>
                         </div>
                         {/*<div> /!* Added a div for styling the price *!/*/}
@@ -22,7 +23,8 @@ const ListingCard = ({ firstName, lastName, description, price, profilePicture, 
                         {/*</div>*/}
                     </div>
                     <div className="col-9 ps-4"> {/* Adjusted column size for description */}
-                        <h3 className="fw-bold">{firstName} {lastName.charAt(0)}.</h3>
+                        {/*<h3 className="fw-bold">{firstName} {lastName.charAt(0)}.</h3>*/}
+                        <h3 className="fw-bold">{firstName} {lastName}</h3>
                         <p className="flex-grow-1">{description}</p> {/* flex-grow-1 will allow the paragraph to expand */}
                         {buttonDesc && <button className="btn btn-dark mt-3" onClick={buttonAction}>{buttonDesc}</button>}
                     </div>

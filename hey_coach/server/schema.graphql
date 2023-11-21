@@ -57,9 +57,9 @@ type CoachProfile {
     "Placeholder. Potentially removed with calendly"
     sessionSlotsAvailable: [PreferredDay]
     "Default session duration"
-    sessionDuration: Int!
+    sessionDuration: Int
     "Default session price"
-    sessionPrice: Float!
+    sessionPrice: Float
 }
 
 enum SessionGoal {
