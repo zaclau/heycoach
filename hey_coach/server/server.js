@@ -5,17 +5,6 @@ const {GraphQLScalarType} = require('graphql');
 const {Kind} = require('graphql/language');
 const {MongoClient, ObjectId} = require('mongodb');
 
-// Core Node Modules
-const fs = require('fs');
-const express = require('express');
-
-// Apollo Server and GraphQL Modules
-const { ApolloServer, UserInputError } = require('apollo-server-express');
-const { GraphQLScalarType } = require('graphql');
-const { Kind } = require('graphql/language');
-
-// MongoDB Modules
-const { MongoClient, ObjectId } = require('mongodb');
 
 // Custom Scalars (GraphQL)
 const { DateTimeResolver } = require('graphql-scalars');

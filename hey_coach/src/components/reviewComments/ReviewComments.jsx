@@ -1,3 +1,4 @@
+import React from 'react';
 function ReviewComments() {
     return (
         <div className="container my-5">
