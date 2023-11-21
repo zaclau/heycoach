@@ -51,7 +51,7 @@ const resolvers = {
     Query: {
         // User Queries
         getUserByEmail: getUserByEmailResolver,
-        getUserById: getUserByIDResolver,
+        getUserById: getUserByIdResolver,
         getAllUsers: getAllUsersResolver,
         getAllCoaches: getAllCoachesResolver,
         getAllCoachees: getAllCoacheesResolver,
@@ -91,15 +91,20 @@ async function getUserByEmailResolver(_, args) {
     }
 }
 
-async function getUserByIDResolver(_, args) {
+async function getUserByIdResolver(_, args) {
     try {
+        // console.log('Args received:', args); // Check the incoming arguments
         const { userId } = args;
+        // console.log('Attempting to find user with ID:', new ObjectId(userId)); // Confirm the ID being queried
         const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+        // console.log('User found:', user); // Log the found user
         return user;
     } catch (error) {
+        // console.error('Error encountered:', error.message); // Log the full error message
         throw new Error(`Error in getUserByIDResolver: ${error.message}`);
     }
 }
+
 
 async function getAllUsersResolver() {
     try {
@@ -198,29 +203,29 @@ async function getSessionsForUserResolver(_, { userId }) {
 
 async function signUpUserResolver(_, args) {
     try {
-        // Extract newUser details from the arguments
         const { newUser } = args;
 
-        const userDocument = {
-            email: newUser.email,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            profilePicture: newUser.profilePicture,
+        console.log('Received newUser:', newUser); // Debugging log
+        const result = await db.collection('users').insertOne(newUser);
+
+        // Create the return object by extracting the fields from newUser
+        // and combining them with the generated _id
+        const userToReturn = {
+            _id: result.insertedId.toString(), // Convert ObjectId to String
+            ...newUser,
         };
 
-        // Insert the new user into the database
-        const result = await db.collection('users').insertOne(userDocument);
+        // Exclude sensitive fields if any (like password) before returning
+        // For example: delete userToReturn.password;
 
-        // Return the created user object, excluding sensitive fields like password
-        return {
-            _id: result.insertedId,
-            ...userDocument,
-        };
+        return userToReturn;
+
     } catch (error) {
-        console.error(`Error in signUpUser: ${error.message}`);
+        console.error(`Error in signUpUserResolver: ${error.message}`);
         throw new Error(`Error Thrown: ${error.message}`);
     }
 }
+
 
 async function updateUserProfileResolver(_, args) {
     try {

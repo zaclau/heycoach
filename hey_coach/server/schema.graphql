@@ -196,7 +196,7 @@ type Query {
     ################
 
     getUserByEmail(email: String!): User  # implemented
-    getUserById(id: ID!): User  # implemented
+    getUserById(userId: ID!): User  # implemented
     getAllUsers: [User]  # implemented
     getAllCoaches: [User]  # implemented, tested
     getAllCoachees: [User]  # implemented, tested
