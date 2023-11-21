@@ -3,9 +3,13 @@ import { useForm } from "react-hook-form"
 import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import { useGoogleLogin } from '@react-oauth/google';
 import { graphQLFetch } from "../../graphQL/graphQLFetch";
+import { useNavigate } from 'react-router-dom';
 
-function Login({ userManagement}) {
+function Login({ userManagement }) {
     const { register, handleSubmit, formState: { errors } } = useForm();
+    
+    const navigate = useNavigate();
+
     const login = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -15,7 +19,7 @@ function Login({ userManagement}) {
             const userInfo = await response.json();
             console.log('Google API userinfo: ', userInfo); //TODO: To be removed
 
-            // Get user from backend. If user exists, return user and signin. Else, create new user and profile.
+            // Get user from backend. If user exists, return user and signin. Else, redirect to signup
             const getUserQuery = `
                 query getUserByEmail($email: String!) {
                     getUserByEmail(email: $email) {
@@ -26,18 +30,52 @@ function Login({ userManagement}) {
                         profilePicture
                         googleOuthToken
                         stripeCustomerId
-                        loggedCreatedAt
-                        profileAsCoach
-                        profileAsCoachee
+                        profileAsCoach {
+                        description
+                        tagsOfSpecialties
+                        sessionSlotsAvailable {
+                            day
+                            slots {
+                                start
+                                end
+                            }
+                        }
+                        sessionDuration
+                        sessionPrice
+                        }
+                        profileAsCoachee {
+                            description
+                        sessionSlotsPreferred {
+                            day
+                            slots {
+                                start
+                                end
+                            }
+                        }
+                        tagsOfGoals
+                        }
                     }
                 }
-            `
+            `;
             const email = userInfo.email;
-            const variables = {
-                email,
-            };
-            const existingUser = await graphQLFetch(getUserQuery, variables);
-            console.log(existingUser);
+            const existingUser = await graphQLFetch(getUserQuery, { email });
+            console.log('Existing user found on signin/up: ', existingUser); //TODO: Remove console output
+            
+
+            // Redirect to Listings page if existing user
+            if (existingUser) {
+                userManagement.signInUser(existingUser);    // Start user session
+                navigate("/listings");
+            }
+
+            // Redirect to signup form
+            navigate("/signup", { state: { 
+                email: userInfo.email, 
+                firstName: userInfo.given_name,
+                lastName: userInfo.family_name,
+                profilePicture: userInfo.picture
+            }})
+
         },
         onError: (error) => console.log(error), 
     });

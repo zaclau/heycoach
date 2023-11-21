@@ -8,6 +8,7 @@ import Signup from "./pages/signup/Signup.jsx";
 import Login from "./pages/login/Login.jsx";
 import Bookings from "./pages/bookings/Bookings.jsx";
 import CoachProfile from "./pages/coachProfile/CoachProfile.jsx";
+import SignupCoach from "./pages/signup/SignupCoach.jsx";
 
 const NotFound = () => <h1>Page Not Found</h1>;
 
@@ -31,7 +32,9 @@ function Contents() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/signup" element={<Signup userManagement={userManagement}/>} />
+      <Route path="/signup" element={<Signup userManagement={userManagement}  signUpInfo={null}/>} />
+      <Route path="/signup/coach" element={ <SignupCoach userManagement={userManagement} /> } />
+      {/* <Route path="/signup/user" element={ <SignupCoachee userManagement={userManagement} /> } /> */}
       <Route path="/login" element={<Login userManagement={userManagement}/>} />
       <Route path="/listings" element={<Listings userManagement={userManagement}/>} />
       <Route path="/bookings" element={<Bookings userManagement={userManagement}/>} />
