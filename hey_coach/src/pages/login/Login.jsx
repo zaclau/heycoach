@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form"
 import ErrorMessage from "../../components/errorMessage/ErrorMessage";
+import { GoogleLogin } from '@react-oauth/google';
 
 function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
@@ -35,6 +36,14 @@ function Login() {
                     <input type="submit" value="Login" className="form-control btn btn-light mt-4"/>
 
                 </form>
+                <GoogleLogin
+                    onSuccess={credentialResponse => {
+                        console.log(credentialResponse);
+                    }}
+                    onError={() => {
+                        console.log('Login Failed');
+                    }}
+                />;
             </div>
         </div>
     )
