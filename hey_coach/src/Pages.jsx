@@ -34,6 +34,7 @@ function Contents() {
       <Route path="/signup" element={<Signup userManagement={userManagement}/>} />
       <Route path="/login" element={<Login userManagement={userManagement}/>} />
       <Route path="/listings" element={<Listings userManagement={userManagement}/>} />
+      {/* change listings to have a query parameter */}
       <Route path="/bookings" element={<Bookings userManagement={userManagement}/>} />
       <Route path="/coaches/:coachId" element={<CoachProfile userManagement={userManagement}/>} />
       <Route component={NotFound} />
