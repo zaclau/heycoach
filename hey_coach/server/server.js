@@ -1,10 +1,3 @@
-const fs = require('fs');
-const express = require('express');
-const {ApolloServer, UserInputError} = require('apollo-server-express');
-const {GraphQLScalarType} = require('graphql');
-const {Kind} = require('graphql/language');
-const {MongoClient, ObjectId} = require('mongodb');
-
 // Core Node Modules
 const fs = require('fs');
 const express = require('express');
