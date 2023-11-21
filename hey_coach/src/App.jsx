@@ -5,12 +5,10 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 // require("dotenv").config();
 
 function App() {
-  console.log('Entered App!');
+  const clientId = process.env.REACT_APP_GAPI_CLIENT_ID;
   return (
     <BrowserRouter>
-      <GoogleOAuthProvider
-        clientId="453091724462-34n2nq33sgu268q1r22hmllr4g8fnp0s.apps.googleusercontent.com"  
-      >
+      <GoogleOAuthProvider clientId={clientId}>
         <Pages />
       </GoogleOAuthProvider> 
       

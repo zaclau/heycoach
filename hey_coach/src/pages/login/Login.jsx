@@ -1,9 +1,45 @@
 import { useForm } from "react-hook-form"
 import ErrorMessage from "../../components/errorMessage/ErrorMessage";
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
+import { graphQLFetch } from "../../graphQL/graphQLFetch";
 
-function Login() {
+function Login({ userManagement}) {
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const login = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${tokenResponse.access_token}` }
+            });
+            const userInfo = await response.json();
+            console.log('Google API userinfo: ', userInfo); //TODO: To be removed
+
+            // Get user from backend. If user exists, return user and signin. Else, create new user and profile.
+            const getUserQuery = `
+                query getUserByEmail($email: String!) {
+                    getUserByEmail(email: $email) {
+                        _id
+                        email
+                        firstName
+                        lastName
+                        profilePicture
+                        googleOuthToken
+                        stripeCustomerId
+                        loggedCreatedAt
+                        profileAsCoach
+                        profileAsCoachee
+                    }
+                }
+            `
+            const email = userInfo.email;
+            const variables = {
+                email,
+            };
+            const existingUser = await graphQLFetch(getUserQuery, variables);
+            console.log(existingUser);
+        },
+        onError: (error) => console.log(error), 
+    });
     return (
         <div className="container-xxl bd-gutter">
             <h1 className="text-center fw-bolder my-5">
@@ -35,15 +71,9 @@ function Login() {
                     
                     <input type="submit" value="Login" className="form-control btn btn-light mt-4"/>
 
+                    <button onClick={() => login()} className="form-control btn btn-light mt-4">Sign in with Google</button>
                 </form>
-                <GoogleLogin
-                    onSuccess={credentialResponse => {
-                        console.log(credentialResponse);
-                    }}
-                    onError={() => {
-                        console.log('Login Failed');
-                    }}
-                />;
+                
             </div>
         </div>
     )
