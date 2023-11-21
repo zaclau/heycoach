@@ -1,3 +1,4 @@
+import React from 'react';
 const ListingCard = ({ buttonDesc, buttonAction }) => {
     return (
         // 2 columns: 1 for picture and pricing, 1 for details on the right

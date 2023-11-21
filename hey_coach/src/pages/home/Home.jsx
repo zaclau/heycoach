@@ -1,3 +1,4 @@
+import React from 'react';
 import Featured from "../../components/featured/Featured";
 import FeaturedCoaches from "../../components/featuredCoaches/FeaturedCoaches";
 import Footer from "../../components/footer/Footer";

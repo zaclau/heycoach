@@ -1,3 +1,4 @@
+import React from 'react';
 import "./topicList.css";
 
 const TopicList = () => {
