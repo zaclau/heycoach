@@ -1,16 +1,45 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+/*
+Implementer: Lennard
+
+This implementation ties SearchBar.jsx and Listings very closely together
+
+It allows for a dynamic search feature where the search results can be controlled via URL parameters,
+enabling deep linking and bookmarking of specific search states.
+
+// Implementation:
+
+handleSearchClick
+- uses navigate to update the URL based on search query
+
+useEffect hook is designed to:
+ - respond to changes in the URL's query parameters,
+ - extract the search parameter,
+ - update the local state with this search term,
+ - perform a search based on this term.
+ */
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import ListingCard from '../../components/listingCard/ListingCard';
 import SearchBar from '../../components/searchBar/SearchBar';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 
 const Listings = () => {
-    // State variables
     const [searchTerm, setSearchTerm] = useState('');
     const [coaches, setCoaches] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
 
-    // Handler to fetch coaches data from GraphQL API
+    // Listings.jsx
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const searchQuery = queryParams.get('search') || '';
+        console.log('Search Query:', searchQuery); // Debugging line
+        setSearchTerm(searchQuery);
+        handleSearch(searchQuery);
+    }, [location.search]);
+
+
     const fetchCoaches = async () => {
         const query = `
             query GetAllCoaches {
@@ -28,38 +57,34 @@ const Listings = () => {
                 }
             }
         `;
-
         const data = await graphQLFetch(query);
         if (data) {
             setCoaches(data.getAllCoaches);
         }
     };
 
-    // Handler to initiate search and filter
-    const handleSearch = async () => {
-        await fetchCoaches(); // Fetch all coaches again before filtering
-
+    const handleSearch = async (searchQuery) => {
+        await fetchCoaches();
         setCoaches(prevCoaches => {
-            const filteredCoaches = prevCoaches
-                .filter(coach => {
-                    const matchesDescription = searchTerm ? coach.profileAsCoach.description.toLowerCase().includes(searchTerm.toLowerCase()) : true;
-                    return matchesDescription;
-                })
-                .slice(0, 30); // Get top 30 matches
-
-            // Shuffle the array of filtered coaches
-            for (let i = filteredCoaches.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [filteredCoaches[i], filteredCoaches[j]] = [filteredCoaches[j], filteredCoaches[i]];
-            }
-
-            return filteredCoaches;
+            return shuffleAndFilterArray(prevCoaches, searchQuery);
         });
     };
 
-    // Pass this function as a prop to the SearchBar component
-    const handleSearchClick = async () => {
-        await handleSearch();
+    const shuffleAndFilterArray = (array, query) => {
+        let shuffledArray = array.filter(coach =>
+            coach.profileAsCoach.description.toLowerCase().includes(query.toLowerCase())
+        ).slice(0, 30);
+
+        for (let i = shuffledArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+        }
+        return shuffledArray;
+    };
+
+    const handleSearchClick = (query) => {
+        // Navigate to the updated URL with search term
+        navigate(`/listings?search=${encodeURIComponent(query)}`);
     };
 
     return (
@@ -68,10 +93,9 @@ const Listings = () => {
                 <SearchBar
                     setSearchTerm={setSearchTerm}
                     searchTerm={searchTerm}
-                    onSearch={handleSearchClick} // Pass the handler here
+                    onSearch={handleSearchClick}
                 />
             </div>
-
             {coaches.map(coach => (
                 <ListingCard
                     key={coach._id}
@@ -89,6 +113,123 @@ const Listings = () => {
 };
 
 export default Listings;
+
+
+
+
+//############################################
+// V using button handler
+//############################################
+
+// import React, { useState, useEffect } from 'react';
+// import { useNavigate } from 'react-router';
+// import ListingCard from '../../components/listingCard/ListingCard';
+// import SearchBar from '../../components/searchBar/SearchBar';
+// import { graphQLFetch } from '../../graphQL/graphQLFetch';
+//
+// // useLocation hook
+// import { useLocation } from "react-router-dom";
+//
+// const Listings = () => {
+//     // State variables
+//     const [searchTerm, setSearchTerm] = useState('');
+//     const [coaches, setCoaches] = useState([]);
+//     const navigate = useNavigate();
+//
+//     // Extract searchTerm for query params
+//     const location = useLocation();
+//     const queryParams = new URLSearchParams(location.search);
+//     const searchQuery = queryParams.get('search');
+//
+//
+//     // Handler to fetch coaches data from GraphQL API
+//     const fetchCoaches = async () => {
+//         const query = `
+//             query GetAllCoaches {
+//                 getAllCoaches {
+//                     _id
+//                     firstName
+//                     lastName
+//                     profilePicture
+//                     profileAsCoach {
+//                         description
+//                         tagsOfSpecialties
+//                         sessionDuration
+//                         sessionPrice
+//                     }
+//                 }
+//             }
+//         `;
+//
+//         const data = await graphQLFetch(query);
+//         if (data) {
+//             setCoaches(data.getAllCoaches);
+//         }
+//     };
+//
+//     // Initiate search and filter based on searchQuery
+//     useEffect(() => {
+//         if (searchQuery) {
+//             setSearchTerm(searchQuery);
+//             handleSearch(searchQuery);
+//         }
+//     }, [searchQuery]);
+//
+//
+//     // Handler to initiate search and filter
+//     const handleSearch = async () => {
+//         await fetchCoaches(); // Fetch all coaches again before filtering
+//
+//         setCoaches(prevCoaches => {
+//             const filteredCoaches = prevCoaches
+//                 .filter(coach => {
+//                     const matchesDescription = searchTerm ? coach.profileAsCoach.description.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+//                     return matchesDescription;
+//                 })
+//                 .slice(0, 30); // Get top 30 matches
+//
+//             // Shuffle the array of filtered coaches
+//             for (let i = filteredCoaches.length - 1; i > 0; i--) {
+//                 const j = Math.floor(Math.random() * (i + 1));
+//                 [filteredCoaches[i], filteredCoaches[j]] = [filteredCoaches[j], filteredCoaches[i]];
+//             }
+//
+//             return filteredCoaches;
+//         });
+//     };
+//
+//     // Pass this function as a prop to the SearchBar component
+//     const handleSearchClick = async () => {
+//         await handleSearch();
+//     };
+//
+//     return (
+//         <>
+//             <div className="container my-3 mb-5">
+//                 <SearchBar
+//                     setSearchTerm={setSearchTerm}
+//                     searchTerm={searchTerm}
+//                     onSearch={handleSearchClick} // Pass the handler here
+//                 />
+//             </div>
+//
+//             {coaches.map(coach => (
+//                 <ListingCard
+//                     key={coach._id}
+//                     firstName={coach.firstName}
+//                     lastName={coach.lastName}
+//                     description={coach.profileAsCoach.description}
+//                     price={coach.profileAsCoach.sessionPrice}
+//                     profilePicture={coach.profilePicture}
+//                     buttonDesc="View Profile"
+//                     buttonAction={() => navigate('/coaches/' + coach._id)}
+//                 />
+//             ))}
+//         </>
+//     );
+// };
+//
+// export default Listings;
 
 
 //############################################
