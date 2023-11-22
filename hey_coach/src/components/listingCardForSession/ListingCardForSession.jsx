@@ -22,8 +22,6 @@ const ListingCardForSession = ({
         return new Date(dateTime).toLocaleTimeString(undefined, options);
     };
 
-
-
     const profileImageStyle = {
         width: '75px',        // Set image width
         height: '75px',       // Set image height
@@ -50,7 +48,7 @@ const ListingCardForSession = ({
                         <p className="mb-0 small"><b>Time</b> {formatTime(sessionDateTime)}</p>
                         <p className="mb-2 small"><b>Address</b> {sessionLocation}</p>
                         {/*<p className="mb-2 small"><b>Fee</b> ${sessionCost}</p>*/}
-                        <button className="btn btn-danger btn-sm" onClick={buttonAction}>{buttonLabel}</button>
+                        <button className="btn btn-dark btn-sm" onClick={buttonAction}>{buttonLabel}</button>
                     </div>
                 </div>
             </div>

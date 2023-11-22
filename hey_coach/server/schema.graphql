@@ -164,24 +164,24 @@ input InputPreferredTime {
 }
 
 input InputCoachSession {
-    coachId: ID!
-    coacheeId: ID!
-    dateTime: DateTime! # using graphql-scalars
-    status: StatusOfSession!
+    coachId: ID
+    coacheeId: ID
+    dateTime: DateTime # using graphql-scalars
+    status: StatusOfSession
     location: String
     review: InputReview
     receipt: [InputReceipt]
 }
 
 input InputReview {
-    text: String!
-    rating: Int!
+    text: String
+    rating: Int
     createdAt: DateTime
 }
 
 input InputReceipt {
-    stripeId: String!
-    amount: Float!
+    stripeId: String
+    amount: Float
     status: StatusOfPayment
 }
 

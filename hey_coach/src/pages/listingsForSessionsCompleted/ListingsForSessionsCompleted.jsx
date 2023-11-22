@@ -15,6 +15,7 @@ const ListingsForSessionsCompleted = ({ userId }) => {
         const sessionsQuery = `
             query GetAllSessionsForUser($userId: ID!) {
                 getAllSessionsForUser(userId: $userId) {
+                    _id
                     coachId
                     coacheeId
                     dateTime
@@ -59,13 +60,14 @@ const ListingsForSessionsCompleted = ({ userId }) => {
         <div>
             {sessions.map(session => (
                 <ListingCardForSession
+                    sessionId = {session._id}
                     coacheePicUrl={session.coacheePicUrl}
                     coachPicUrl={session.coachPicUrl}
                     coachName={session.coachName}
                     coacheeName={session.coacheeName}
                     sessionDateTime={session.dateTime}
                     sessionLocation={session.location}
-                    buttonLabel="Cancel Session"
+                    buttonLabel="Share Review"
                     buttonAction={() => navigate(`/coaches/${session.coachId}`)}
                 />
             ))}
