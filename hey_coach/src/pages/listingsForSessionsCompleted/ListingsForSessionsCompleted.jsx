@@ -1,15 +1,77 @@
+// SUPPORT
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import ListingCardForSession from "../../components/listingCardForSession/ListingCardForSession";
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 
-const ListingsForSessionsCompleted = ({ userId }) => {
+// COMPONENETS
+import ListingCardForSession from "../../components/listingCardForSession/ListingCardForSession";
+import ModalForReviews from "../../modals/ModalForReview/ModalForReviews";
+
+
+const ListingsForSessionsUpcoming = ({ userId }) => {
+
+    //############################################
+    // VARIABLES
+    //############################################
+
     const [sessions, setSessions] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [currentSession, setCurrentSession] = useState(null); // TODO: what is currentSession For?
     const navigate = useNavigate();
 
+    // TODO replace with userId from context
     useEffect(() => {
         fetchSessions();
     }, [userId]);
+
+    //############################################
+    // MODAL HANDLERS
+    //############################################
+
+    const handleReviewClick = (session) => {
+        console.log("review clicked", session)
+        setCurrentSession(session);
+        setShowModal(true);
+    };
+
+    const handleReviewSubmit = async (reviewData) => {
+        console.log("review submission", currentSession);
+        const mutation = `
+            mutation UpdateExistingSession($sessionId: ID!, $updatedSessionDetails: InputCoachSession!) {
+                updateExistingSession(sessionId: $sessionId, updatedSessionDetails: $updatedSessionDetails) {
+                    _id
+                    review {
+                        text
+                        rating
+                    }
+                }
+            }
+        `;
+
+        const vars = {
+            sessionId: currentSession._id,
+            updatedSessionDetails: {
+                review:{
+                    text: reviewData.text,
+                    rating: reviewData.rating
+                }
+            }
+        };
+
+        const data = await graphQLFetch(mutation, vars);
+        console.log("Session status updated", data);
+
+        setShowModal(false);
+        await fetchSessions();
+    }
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+    }
+
+    //############################################
+    // COACH SESSION HANDLERS
+    //############################################
 
     const fetchSessions = async () => {
         const sessionsQuery = `
@@ -56,24 +118,34 @@ const ListingsForSessionsCompleted = ({ userId }) => {
         return data.getUserById;
     };
 
+    //############################################
+    // RENDERS
+    //############################################
+
     return (
         <div>
             {sessions.map(session => (
                 <ListingCardForSession
-                    sessionId = {session._id}
                     coacheePicUrl={session.coacheePicUrl}
                     coachPicUrl={session.coachPicUrl}
                     coachName={session.coachName}
                     coacheeName={session.coacheeName}
                     sessionDateTime={session.dateTime}
                     sessionLocation={session.location}
-                    buttonLabel="Share Review"
-                    buttonAction={() => navigate(`/coaches/${session.coachId}`)}
+                    buttonLabel="Submit/Edit Review"
+                    buttonAction={() => handleReviewClick(session)}
                 />
             ))}
+            {showModal && (
+                <ModalForReviews
+                    show = {showModal}
+                    onConfirm={handleReviewSubmit}
+                    onCancel={handleCloseModal}
+                />
+            )}>
         </div>
     );
 };
 
-export default ListingsForSessionsCompleted;
+export default ListingsForSessionsUpcoming;
 

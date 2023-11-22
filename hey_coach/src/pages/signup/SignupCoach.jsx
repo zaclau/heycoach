@@ -15,11 +15,8 @@ function SignupCoach() {
         if (localStorage.getItem('user')) {
             userManagement.signInUser(localStorage.getItem('user'));    // Start user session
             console.log('localstorage: ', localStorage.getItem('user'));
-            navigate('/listings');
-            if (localStorage.getItem('user')) {
-                localStorage.clear();
-                navigate('/listings');
-            }   
+            localStorage.clear();
+            navigate('/');
         }
     }, []);
     

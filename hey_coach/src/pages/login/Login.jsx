@@ -68,7 +68,7 @@ function Login() {
             // Redirect to Listings page if existing user
             if (existingUser.getUserByEmail) {
                 userManagement.signInUser(existingUser.getUserByEmail);    // Start user session
-                navigate("/listings");
+                navigate("/");
                 return;
             }
 
