@@ -12,8 +12,8 @@ const Home = () => {
   return (
     <div>
         <Header/>
-        <h1>"USER LANDING"</h1>
-        <UserLanding/>
+        {/*<h1>"USER LANDING"</h1>*/}
+        {/*<UserLanding/>*/}
     </div>
   );
 };
