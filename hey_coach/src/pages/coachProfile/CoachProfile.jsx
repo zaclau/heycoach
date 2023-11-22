@@ -99,6 +99,10 @@ function CoachProfile() {
         return coacheeData ? coacheeData.getUserById : null;
     };
 
+    const handleScheduleSession = () => {
+        navigate("/bookings", { state: {coach: coach} });
+    }
+
 
     // Render a loading state until the coach data is fetched
     if (!coach) return <p>Loading...</p>;
@@ -118,7 +122,7 @@ function CoachProfile() {
                     price={coach.profileAsCoach.sessionPrice}
                     profilePicture={coach.profilePicture}
                     buttonDesc="Schedule a Session"
-                    buttonAction={() => navigate("/bookings")}
+                    buttonAction={() => handleScheduleSession()}
                 />
                 <hr></hr>
 

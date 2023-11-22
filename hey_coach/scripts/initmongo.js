@@ -19,7 +19,7 @@ db.dropDatabase()
 db.createCollection("users");
 
 let n_users = 300; // Total number of users
-let n_sessions = 1000;
+let n_sessions = 5_000;
 
 const goals = ["StrengthBuilding", "EnduranceBuilding", "AgilityBuilding", "FatBurn", "Wellness", "MentalFocus"]
 const specialties = ["Judo", "Yoga", "BJJ", "Running", "Acrobatics", "Dance"]
@@ -34,8 +34,8 @@ for (let i = 1; i <= n_users; i++) {
             height: 300,
             width: 300
         }),
-        googleOuthToken: "googleToken_" + i,
-        stripeCustomerId: "stripeID_" + i,
+        googleOuthToken: faker.database.mongodbObjectId(),
+        stripeCustomerId: faker.database.mongodbObjectId(),
         profileAsCoach: i % 2 === 0 ? {
             description: faker.lorem.paragraph(),
             tagsOfSpecialties: [specialties[Math.floor(Math.random() * specialties.length)], specialties[Math.floor(Math.random() * specialties.length)]],
@@ -72,12 +72,12 @@ for (let i = 0; i < n_sessions; i++) {
 
     // Create receipt objects
     let receipts = [{
-        stripeId: "stripe_" + i,
-        amount: Math.random() * 100,
-        status: "PENDING" // or another logic for status
+        stripeId: faker.database.mongodbObjectId(),
+        amount: faker.finance.amount(),
+        status: "PENDING"
     }];
 
-    // Optionally create a review object if the session is COMPLETED
+    // Create a review object if the session is COMPLETED
     let review;
     if (randomStatus === "COMPLETED") {
         // Create a review object if the session is completed
@@ -95,7 +95,7 @@ for (let i = 0; i < n_sessions; i++) {
     let session = {
         coachId: randomCoachId,
         coacheeId: randomCoacheeId,
-        dateTime: new Date(), // Replace with actual logic for date-time
+        dateTime: faker.date.anytime(),
         status: randomStatus,
         location: faker.location.streetAddress(),
         googleCalendarEventId: "gcal_" + i,

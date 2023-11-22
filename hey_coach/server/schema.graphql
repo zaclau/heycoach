@@ -102,7 +102,7 @@ type CoachingSession {
 type Receipt {
     _id: ID!
     stripeId: String!
-    amount: Float!
+    amount: Float
     status: StatusOfPayment!
 }
 
