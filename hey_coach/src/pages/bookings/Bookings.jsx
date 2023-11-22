@@ -84,17 +84,12 @@ function Bookings() {
                             <div style={{whiteSpace : 'nowrap'}}>
                                 <label className="form-label mt-2 mb-1 fw-bold">Session Price</label>
                                 &nbsp;
-                                <text>$XXX</text>
+                                <text>${ coach.profileAsCoach.sessionPrice }</text>
                             </div>
                             <div style={{whiteSpace : 'nowrap'}}>
                                 <label className="form-label mt-2 mb-1 fw-bold">Duration</label>
                                 &nbsp;
-                                <text>60 mins</text>
-                            </div>
-                            <div style={{whiteSpace : 'nowrap'}}>
-                                <label className="form-label mt-2 mb-1 fw-bold">Total</label>
-                                &nbsp;
-                                <text>$XXX</text>
+                                <text>{ coach.profileAsCoach.sessionDuration } mins</text>
                             </div>
                         </div>
                     </div>

@@ -121,7 +121,7 @@ function SignupCoach() {
                     <input {...register("sessionPrice", {required: 'Session price is required.'})} className="form-control text-white bg-dark rounded-pill" placeholder="Session Price" type="number" step="0.01" min="0" ></input>
                     {errors.sessionPrice && <ErrorMessage message={errors.sessionPrice?.message} />}
                     
-                    <input type="submit" value="Proceed" className="form-control btn btn-light mt-4"/>
+                    <input type="submit" value="Proceed to Payment setup" className="form-control btn btn-light mt-4"/>
                     
                     <hr></hr>
                 </form>
