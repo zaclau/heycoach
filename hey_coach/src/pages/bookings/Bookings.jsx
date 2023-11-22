@@ -1,43 +1,85 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from "react-hook-form"
 import ListingCard from "../../components/listingCard/ListingCard"
 import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import CalendarPicker from "../../components/calendarpicker/CalendarPicker";
 import "./bookings.css"
+import { useAuthContext } from '../../auth/auth';
+import { useLocation } from 'react-router-dom';
+import { graphQLFetch } from '../../graphQL/graphQLFetch';
 
 function Bookings() {
+    const location = useLocation();
+    const userManagement = useAuthContext();
+    const coach = location.state.coach;
+    
     const { register, handleSubmit, formState: { errors } } = useForm();
+
+    const [ calendar, setCalendar ] = useState();
+    const handleBookSession = async (data) => {
+        const originalDate = new Date(calendar.$d);
+        const dateTime = originalDate.toISOString();
+        const status = 'SCHEDULED';
+
+        const coachId = coach._id;
+        const coacheeId = userManagement.userStore._id;
+
+        const createSessionMutation = `
+            mutation createNewSession($newSession: InputCoachSession!) {
+                createNewSession(newSession: $newSession) {
+                    _id
+                    coachId
+                    coacheeId
+                    dateTime
+                    status
+                    location
+                }
+            }
+        `;
+
+        const variables = {
+            newSession: {
+                coachId,
+                coacheeId,
+                dateTime,
+                status, 
+        }}
+
+        try {
+            const newSession = await graphQLFetch(createSessionMutation, variables);
+            if (newSession.createNewSession) {
+                console.log('New session created from Bookings: ', newSession);
+                // TODO: Navigate to Stripe payment
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div className="container-xxl bd-gutter">
-            <ListingCard />
+            <ListingCard 
+                key={coach._id}
+                firstName={coach.firstName}
+                lastName={coach.lastName}
+                description={coach.profileAsCoach.description}
+                price={coach.profileAsCoach.sessionPrice}
+                profilePicture={coach.profilePicture}
+            />
             <div className="booking-form">
-                <form onSubmit={handleSubmit((data) => {
-                        console.log(data)   // TODO: Replace with backend call to login endpoint
-                    })} className="col-12">
+                <form onSubmit={handleSubmit(handleBookSession)} className="col-12">
 
                     <div class="row px-4">
                         <div class="col">
-                            <label className="form-label mt-2 mb-1 fw-bold">Session Duration</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="reverseCheck1"/>
-                                <label class="form-check-label" for="reverseCheck1">
-                                    Basic Sweat (30 mins)
-                                </label>
+                            <div class="row mb-3">
+                                <label className="form-label mt-2 mb-1 fw-bold">Session Date & Time</label>
+                                <div class="col-7" id="calendar">
+                                    <CalendarPicker calendar={ calendar } setCalendar={ setCalendar } />
+                                </div>
+                                {errors.password && <ErrorMessage message={errors.password?.message} />}
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="reverseCheck2"/>
-                                <label class="form-check-label" for="reverseCheck2">
-                                    Full Burn (60 mins)
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="reverseCheck3"/>
-                                <label class="form-check-label" for="reverseCheck3">
-                                    Power to the MAX (90 mins)
-                                </label>
-                            </div>
-                            {errors.duration && <ErrorMessage message={errors.duration?.message} />}
                         </div>
+                        
                         <div class="col">
                             <div style={{whiteSpace : 'nowrap'}}>
                                 <label className="form-label mt-2 mb-1 fw-bold">Session Price</label>
@@ -58,15 +100,9 @@ function Bookings() {
                     </div>
                     <div class="row px-4 mt-3">
                         <div class="col">
+                            
                             <div class="row mb-3">
-                                <label className="form-label mt-2 mb-1 fw-bold">Session Date & Time</label>
-                                <div class="col-7" id="calendar">
-                                    <CalendarPicker />
-                                </div>
-                                {errors.password && <ErrorMessage message={errors.password?.message} />}
-                            </div>
-                            <div class="row mb-3">
-                                <label className="form-label mt-2 mb-1 fw-bold">Session Location</label>
+                                <label className="form-label mt-2 mb-1 fw-bold">Session Location (TODO: WHERE TO GET LOCATION?)</label>
                                 <div>
                                     <div style={{whiteSpace : 'nowrap'}}>
                                         <label for="loc1">Unit</label>
