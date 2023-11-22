@@ -1,15 +1,12 @@
 import React from 'react';
-import { useForm } from "react-hook-form"
-import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import { useLocation, useNavigate } from 'react-router-dom';
 
-function Signup(props) {
+function Signup() {
     const navigate = useNavigate();
     const location = useLocation();
     console.log('Location.state in Signup page: ', location.state);
     const handleCoachRegistration = () => { navigate('/signup/coach', { state: location.state }) }
     const handleCoacheeRegistration = () => { navigate('/signup/user', { state: location.state }) }
-    const { register, handleSubmit, formState: { errors } } = useForm();    // See https://www.react-hook-form.com/get-started/#ReactWebVideoTutorial
     return (
         <div className="container-xxl bd-gutter">
             <h1 className="text-center fw-bolder my-5">
