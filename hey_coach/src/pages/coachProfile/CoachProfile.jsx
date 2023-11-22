@@ -72,11 +72,33 @@ function CoachProfile() {
             console.log("Sessions Data:", sessionsData);
             const sessionsWithReviews = sessionsData.getAllSessionsForUser.filter(session => session.review !== null);
 
-            // Log sessions with reviews to console
-            console.log("Sessions with Reviews:", sessionsWithReviews);
+            // Fetch coachee details for each session
+            for (let session of sessionsWithReviews) {
+                session.coacheeDetails = await fetchCoacheeDetails(session.coacheeId);
+            }
+
             setValidSessions(sessionsWithReviews);
         }
     };
+
+    const fetchCoacheeDetails = async (coacheeId) => {
+        const coacheeQuery = `
+            query GetUserById($userId: ID!) {
+                getUserById(userId: $userId) {
+
+                    firstName
+                    lastName
+                    profilePicture
+                }
+            }
+        `;
+
+        const coacheeVars = { userId: coacheeId };
+        const coacheeData = await graphQLFetch(coacheeQuery, coacheeVars);
+
+        return coacheeData ? coacheeData.getUserById : null;
+    };
+
 
     // Render a loading state until the coach data is fetched
     if (!coach) return <p>Loading...</p>;
@@ -100,14 +122,14 @@ function CoachProfile() {
                 />
                 <hr></hr>
 
-                <h3 className="fw-semibold mt-4">What Others Say TESTTEST</h3>
+                <h3 className="fw-semibold mt-4">What Others Say</h3>
                 <div className="container">
 
                     {validSessions.map(session => (
                         <ReviewComments
                             // key={session._id}
-                            coacheeProfileUrl="https://en.wikipedia.org/wiki/File:Northern_cardinal_female_in_CP_(02035).jpg"
-                            coacheeName= "bb"
+                            coacheeProfileUrl={session.coacheeDetails.profilePicture}
+                            coacheeName= {session.coacheeDetails.firstName + " " + session.coacheeDetails.lastName}
                             reviewDescription={session.review.text}
                             reviewScore={session.review.rating}
                         />
