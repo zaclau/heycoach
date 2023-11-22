@@ -20,10 +20,8 @@ type User{
     firstName: String!
     "Last Name"
     lastName: String
-    "BSON object of image"
-    profilePicture: String # currently URL.
-    # TODO: implement as binData https://www.mongodb.com/community/forums/t/process-of-storing-images-in-mongodb/15093/2
-    # TODO: saving as string shows fine in DB but as Null in graphql
+    "Image URL"
+    profilePicture: String
 
     # TOKENS
     googleOuthToken: String
@@ -102,12 +100,14 @@ type CoachingSession {
 }
 
 type Receipt {
+    _id: ID!
     stripeId: String!
     amount: Float!
     status: StatusOfPayment!
 }
 
 type Review {
+    _id: ID!
     text: String!
     rating: Int!
     createdAt: DateTime

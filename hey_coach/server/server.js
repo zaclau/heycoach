@@ -59,7 +59,7 @@ const resolvers = {
         // Session Queries
         getAllSessions: getAllSessionsResolver,
         getSessionById: getSessionByIdResolver,
-        getAllSessionsForUser: getSessionsForUserResolver
+        getAllSessionsForUser: getAllSessionsForUserResolver
     },
 
     Mutation: {
@@ -141,14 +141,9 @@ async function getAllCoacheesResolver() {
 async function getAllSessionsResolver(_) {
     try {
         const sessions = await db.collection('sessions').find().toArray();
-        return sessions.map(session => ({
-            ...session,
-            _id: session._id.toString(),
-            coachId: session.coachId.toString(),
-            coacheeId: session.coacheeId.toString(),
-            receipt: session.receipt.map(r => ({ ...r, _id: r._id.toString() })),
-            review: session.review ? { ...session.review, _id: session.review._id.toString() } : null,
-        }));
+        if (!session) return null;
+        return sessions;
+
     } catch (error) {
         throw new Error(`Error Thrown: ${error.message}`);
     }
@@ -160,23 +155,15 @@ async function getSessionByIdResolver(_, { sessionId }) {
     try {
         const sessionObjectId = new ObjectId(sessionId);
         const session = await db.collection('sessions').findOne({ _id: sessionObjectId });
-
         if (!session) return null;
+        return session;
 
-        return {
-            ...session,
-            _id: session._id.toString(),
-            coachId: session.coachId.toString(),
-            coacheeId: session.coacheeId.toString(),
-            receipt: session.receipt,
-            review: session.review ? { ...session.review, _id: session.review._id.toString() } : null,
-        };
     } catch (error) {
         throw new Error(`Error Thrown: ${error.message}`);
     }
 }
 
-async function getSessionsForUserResolver(_, { userId }) {
+async function getAllSessionsForUserResolver(_, { userId }) {
     if (!userId) throw new Error("UserId is required");
 
     try {
@@ -184,18 +171,36 @@ async function getSessionsForUserResolver(_, { userId }) {
         const query = { $or: [{ coachId: userIdObj }, { coacheeId: userIdObj }] };
         const sessions = await db.collection('sessions').find(query).toArray();
 
-        return sessions.map(session => ({
-            ...session,
-            _id: session._id.toString(),
-            coachId: session.coachId.toString(),
-            coacheeId: session.coacheeId.toString(),
-            receipt: session.receipt.map(r => ({ ...r, _id: r._id.toString() })),
-            review: session.review ? { ...session.review, _id: session.review._id.toString() } : null,
-        }));
+        console.log("Sessions:", sessions);
+
+        if (!sessions) return null;
+        return sessions;
     } catch (error) {
         throw new Error(`Error Thrown: ${error.message}`);
     }
 }
+
+
+// async function getAllSessionsForUserResolver(_, { userId }) {
+//     if (!userId) throw new Error("UserId is required");
+//
+//     try {
+//         const userIdObj = new ObjectId(userId);
+//         const query = { $or: [{ coachId: userIdObj }, { coacheeId: userIdObj }] };
+//         const sessions = await db.collection('sessions').find(query).toArray();
+//
+//         return sessions.map(session => ({
+//             ...session,
+//             _id: session._id.toString(),
+//             coachId: session.coachId.toString(),
+//             coacheeId: session.coacheeId.toString(),
+//             receipt: session.receipt.map(r => ({ ...r })),
+//             review: session.review ? { ...session.review } : null,
+//         }));
+//     } catch (error) {
+//         throw new Error(`Error Thrown: ${error.message}`);
+//     }
+// }
 
 // ############################################
 // RESOLVERS, MUTATIONS
