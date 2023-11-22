@@ -18,7 +18,7 @@ db.dropDatabase()
 
 db.createCollection("users");
 
-let n_users = 100; // Total number of users
+let n_users = 300; // Total number of users
 let n_sessions = 1000;
 
 const goals = ["StrengthBuilding", "EnduranceBuilding", "AgilityBuilding", "FatBurn", "Wellness", "MentalFocus"]

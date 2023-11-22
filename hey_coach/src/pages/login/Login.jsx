@@ -60,6 +60,7 @@ function Login() {
                 }
             `;
             const email = userInfo.email;
+            console.log('Reached');
             const existingUser = await graphQLFetch(getUserQuery, { email });
             console.log('Existing user found on signin/up: ', existingUser); //TODO: Remove console output
             
