@@ -19,7 +19,6 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
     const [currentSession, setCurrentSession] = useState(null); // TODO: what is currentSession For?
     const navigate = useNavigate();
 
-    // TODO replace with userId from context
     useEffect(() => {
         fetchSessions();
     }, [userId]);

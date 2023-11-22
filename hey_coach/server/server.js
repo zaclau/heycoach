@@ -171,7 +171,7 @@ async function getAllSessionsForUserResolver(_, { userId }) {
         const query = { $or: [{ coachId: userIdObj }, { coacheeId: userIdObj }] };
         const sessions = await db.collection('sessions').find(query).toArray();
 
-        console.log("Sessions:", sessions);
+        console.log("Sessions for User:", sessions);
 
         if (!sessions) return null;
         return sessions;

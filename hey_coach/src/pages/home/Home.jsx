@@ -7,13 +7,19 @@ import Signup from "../../components/signup/Signup";
 import TopicList from "../../components/topicList/TopicList";
 import "./home.css";
 import UserLanding from "../userLanding/UserLanding";
+import {useAuthContext} from "../../auth/auth";
 
 const Home = () => {
+    const userManagement = useAuthContext();
+    // Check if _uid is available
+    const _uid = userManagement && userManagement.userStore ? userManagement.userStore._id : null;
+
+
   return (
     <div>
         <Header/>
         {/*<h1>"USER LANDING"</h1>*/}
-        {/*<UserLanding/>*/}
+        {_uid && <UserLanding/>}
     </div>
   );
 };
