@@ -58,6 +58,8 @@ type CoachProfile {
     sessionDuration: Int
     "Default session price"
     sessionPrice: Float
+    "Location of the coach"
+    location: String
 }
 
 enum SessionGoal {
@@ -145,6 +147,7 @@ input InputCoachProfile {
     sessionSlotsAvailable: [InputPreferredDay]
     sessionDuration: Int
     sessionPrice: Float
+    location: String
 }
 
 input InputCoacheeProfile {
