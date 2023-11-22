@@ -1,6 +1,7 @@
-const { STRIPE_SECRET_KEY, STRIPE_API_VERSION, APP_NAME, DOMAIN } = process.env;
-const stripe = require('stripe')(STRIPE_SECRET_KEY, {
-  apiVersion: STRIPE_API_VERSION
+import { Redirect } from 'react-router-dom';
+
+const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET_KEY, {
+  apiVersion: process.env.REACT_APP_STRIPE_API_VERSION
 });
 
 // Helper function that get the currency symbol for the given country ISO code
@@ -58,7 +59,7 @@ async function createStripePayout(balance, user) {
     const payout = await stripe.payouts.create({
       amount: amount,
       currency: currency,
-      statement_descriptor: APP_NAME,
+      statement_descriptor: process.env.REACT_APP_APP_NAME,
     }, { stripe_account: user.stripeAccountId });
 
     return payout;
@@ -86,8 +87,8 @@ async function createStripeChargeAndTransfer(source_acc, booking, user) {
       source: source,
       amount: booking.amount,
       currency: booking.currency,
-      description: APP_NAME,
-      statement_descriptor: APP_NAME,
+      description: process.env.REACT_APP_APP_NAME,
+      statement_descriptor: process.env.REACT_APP_APP_NAME,
       // The `transfer_group` parameter must be a unique id for the booking;
       // it must also match between the charge and transfer
       transfer_group: booking.id
@@ -114,6 +115,8 @@ async function createStripeChargeAndTransfer(source_acc, booking, user) {
 // Function to create a new Stripe account for the user
 async function createStripeAccount(user, refresh_url, return_url) {
   try {
+    console.log('hello from stripe.js');
+    console.log('ENV: ', process.env.REACT_APP_APP_NAME);
     // Define the parameters to create a new Stripe account with
     let accountParams = {
       type: 'express',
@@ -136,13 +139,14 @@ async function createStripeAccount(user, refresh_url, return_url) {
     // Create an account link for the user's Stripe account
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: DOMAIN + refresh_url, //current endpt
-      return_url: DOMAIN + return_url, //redirect to this endpt
+      refresh_url: process.env.REACT_APP_DOMAIN + refresh_url, //current endpt
+      return_url: process.env.REACT_APP_DOMAIN + return_url, //redirect to this endpt
       type: 'account_onboarding'
     });
 
     // Redirect to Stripe to start the Express onboarding flow
-    res.redirect(accountLink.url);
+    window.location.href = accountLink.url;
+    //<Redirect to={accountLink.url} />;
 
     return account;
   } catch (error) {
@@ -182,7 +186,7 @@ async function generateAndRedirectToStripeDashboard(req, res, user) {
     // Generate a unique login link for the associated Stripe account to access their Express dashboard
     const loginLink = await stripe.accounts.createLoginLink(
       user.stripeAccountId, {
-        redirect_url: config.publicDomain + '/profile'
+        redirect_url: process.env.REACT_APP_DOMAIN + '/profile'
       }
     );
 
@@ -200,4 +204,4 @@ async function generateAndRedirectToStripeDashboard(req, res, user) {
   }
 }
 
-module.exports = { getCurrencySymbol, getStripeBalance, createStripePayout, createStripeChargeAndTransfer, createStripeAccount, checkStripeAccountOnboarding, generateAndRedirectToStripeDashboard };
+export { getCurrencySymbol, getStripeBalance, createStripePayout, createStripeChargeAndTransfer, createStripeAccount, checkStripeAccountOnboarding, generateAndRedirectToStripeDashboard };
