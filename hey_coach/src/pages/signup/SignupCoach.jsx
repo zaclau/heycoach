@@ -37,17 +37,18 @@ function SignupCoach() {
                     googleOuthToken
                     stripeCustomerId
                     profileAsCoach {
-                    description
-                    tagsOfSpecialties
-                    sessionSlotsAvailable {
-                        day
-                        slots {
-                            start
-                            end
+                        description
+                        tagsOfSpecialties
+                        sessionSlotsAvailable {
+                            day
+                            slots {
+                                start
+                                end
+                            }
                         }
-                    }
-                    sessionDuration
-                    sessionPrice
+                        sessionDuration
+                        sessionPrice
+                        location
                     }
                     profileAsCoachee {
                         description
@@ -71,6 +72,7 @@ function SignupCoach() {
         const description = data.description;
         const sessionDuration = parseInt(data.sessionDuration);
         const sessionPrice = parseFloat(data.sessionPrice);
+        const coachLocation= data.location;
         const userProfileInput = {
             newUser: {email,
             firstName,
@@ -79,7 +81,8 @@ function SignupCoach() {
             profileAsCoach: {
                 description,
                 sessionDuration,
-                sessionPrice
+                sessionPrice,
+                location: coachLocation
             }}
         };
 
@@ -121,6 +124,9 @@ function SignupCoach() {
                     <input {...register("sessionPrice", {required: 'Session price is required.'})} className="form-control text-white bg-dark rounded-pill" placeholder="Session Price" type="number" step="0.01" min="0" ></input>
                     {errors.sessionPrice && <ErrorMessage message={errors.sessionPrice?.message} />}
                     
+                    <label className="form-label mt-2 mb-1">Location</label>
+                    <textarea {...register("location")} className="form-control text-white bg-dark rounded-pill" placeholder="Location"></textarea>
+
                     <input type="submit" value="Proceed to Payment setup" className="form-control btn btn-light mt-4"/>
                     
                     <hr></hr>

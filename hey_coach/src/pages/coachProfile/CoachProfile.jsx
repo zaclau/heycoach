@@ -33,6 +33,7 @@ function CoachProfile() {
                         tagsOfSpecialties
                         sessionDuration
                         sessionPrice
+                        location
                     }
                 }
             }
