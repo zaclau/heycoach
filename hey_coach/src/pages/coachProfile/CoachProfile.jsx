@@ -9,8 +9,10 @@ import { graphQLFetch } from "../../graphQL/graphQLFetch";
 function CoachProfile() {
     const params = useParams();
     const navigate = useNavigate();
+
+    // Variables
     const [coach, setCoach] = useState(null);
-    const [validSessions, setValidSessions] = useState([]); // Initialize state
+    const [validSessions, setValidSessions] = useState([]);
 
 
     useEffect(() => {
@@ -49,34 +51,39 @@ function CoachProfile() {
     };
 
     const fetchSessionsWithReviews = async () => {
+
         const sessionsQuery = `
             query GetAllSessionsForUser($userId: ID!) {
                 getAllSessionsForUser(userId: $userId) {
                     _id
                     coacheeId
                     review {
-                        _id
                         text
                         rating
-                        createdAt
                     }
                 }
             }
-        `;
+            `;
 
         const sessionsVars = { userId: params.coachId };
         const sessionsData = await graphQLFetch(sessionsQuery, sessionsVars);
 
         if (sessionsData) {
+            console.log("Sessions Data:", sessionsData);
             const sessionsWithReviews = sessionsData.getAllSessionsForUser.filter(session => session.review !== null);
 
-            // Now you have only the sessions with reviews
+            // Log sessions with reviews to console
+            console.log("Sessions with Reviews:", sessionsWithReviews);
             setValidSessions(sessionsWithReviews);
         }
     };
 
     // Render a loading state until the coach data is fetched
     if (!coach) return <p>Loading...</p>;
+
+    // Log session data to console
+    // Debugs
+    console.log("Valid Sessions:", validSessions);
 
     return (
         <>
@@ -95,6 +102,7 @@ function CoachProfile() {
 
                 <h3 className="fw-semibold mt-4">What Others Say TESTTEST</h3>
                 <div className="container">
+
                     {validSessions.map(session => (
                         <ReviewComments
                             // key={session._id}
