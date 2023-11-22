@@ -1,8 +1,7 @@
-const stripe = require('stripe')(sk_test_51OEotDEBsUL4jcBypbB6Oroc7l8ruwcSeJsaMEp9FWRgGK0pMb16HupenTkReP7DKn77wjtH2qVFh3YGwwA1NMRB00FY6ZK89P, {
-  apiVersion: '2022-08-01'
+const { STRIPE_SECRET_KEY, STRIPE_API_VERSION, APP_NAME, DOMAIN } = process.env;
+const stripe = require('stripe')(STRIPE_SECRET_KEY, {
+  apiVersion: STRIPE_API_VERSION
 });
-
-const config = require('../../config');
 
 // Helper function that get the currency symbol for the given country ISO code
 const getCurrencySymbol = currency => {
@@ -59,7 +58,7 @@ async function createStripePayout(balance, user) {
     const payout = await stripe.payouts.create({
       amount: amount,
       currency: currency,
-      statement_descriptor: config.appName,
+      statement_descriptor: APP_NAME,
     }, { stripe_account: user.stripeAccountId });
 
     return payout;
@@ -87,8 +86,8 @@ async function createStripeChargeAndTransfer(source_acc, booking, user) {
       source: source,
       amount: booking.amount,
       currency: booking.currency,
-      description: config.appName,
-      statement_descriptor: config.appName,
+      description: APP_NAME,
+      statement_descriptor: APP_NAME,
       // The `transfer_group` parameter must be a unique id for the booking;
       // it must also match between the charge and transfer
       transfer_group: booking.id
@@ -113,7 +112,7 @@ async function createStripeChargeAndTransfer(source_acc, booking, user) {
 // Add the Stripe charge reference to the booking and save it in db
 
 // Function to create a new Stripe account for the user
-async function createStripeAccount(user) {
+async function createStripeAccount(user, refresh_url, return_url) {
   try {
     // Define the parameters to create a new Stripe account with
     let accountParams = {
@@ -137,8 +136,8 @@ async function createStripeAccount(user) {
     // Create an account link for the user's Stripe account
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: config.publicDomain + '/pilots/stripe/authorize', //current endpt
-      return_url: config.publicDomain + '/pilots/stripe/onboarded', //redirect to this endpt
+      refresh_url: DOMAIN + refresh_url, //current endpt
+      return_url: DOMAIN + return_url, //redirect to this endpt
       type: 'account_onboarding'
     });
 
@@ -200,3 +199,5 @@ async function generateAndRedirectToStripeDashboard(req, res, user) {
     res.status(500).send('Internal Server Error');
   }
 }
+
+module.exports = { getCurrencySymbol, getStripeBalance, createStripePayout, createStripeChargeAndTransfer, createStripeAccount, checkStripeAccountOnboarding, generateAndRedirectToStripeDashboard };

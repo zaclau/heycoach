@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
+import { createStripeAccount } from '../../server/stripe';
 
 function SignupCoach({ userManagement }) {
     const location = useLocation();
@@ -74,7 +75,11 @@ function SignupCoach({ userManagement }) {
             console.log('New user created from Signup Coach: ', newUser);
             if (newUser) {
                 userManagement.signInUser(newUser);    // Start user session
-                navigate('/listings');
+                // Create Stripe Account
+                const stripeAccountId = await createStripeAccount(newUser, '/signup/coach', '/listings');
+                console.log('Stripe Account ID: ', stripeAccountId);
+                // Update User with Stripe Account ID
+                //navigate('/listings');
             } // might need else clause to throw error
         } catch (error) {
             console.log(error);

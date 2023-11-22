@@ -59,12 +59,12 @@ function Login({ userManagement }) {
             `;
             const email = userInfo.email;
             const existingUser = await graphQLFetch(getUserQuery, { email });
-            console.log('Existing user found on signin/up: ', existingUser); //TODO: Remove console output
+            console.log('Existing user found on signin/up: ', existingUser.getUserByEmail); //TODO: Remove console output
             
 
             // Redirect to Listings page if existing user
-            if (existingUser) {
-                userManagement.signInUser(existingUser);    // Start user session
+            if (existingUser.getUserByEmail) {
+                userManagement.signInUser(existingUser.getUserByEmail);    // Start user session
                 navigate("/listings");
                 return;
             }
