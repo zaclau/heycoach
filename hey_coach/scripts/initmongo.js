@@ -21,27 +21,30 @@ db.createCollection("users");
 let n_users = 100; // Total number of users
 let n_sessions = 1000;
 
+const goals = ["StrengthBuilding", "EnduranceBuilding", "AgilityBuilding", "FatBurn", "Wellness", "MentalFocus"]
+const specialties = ["Judo", "Yoga", "BJJ", "Running", "Acrobatics", "Dance"]
+
 for (let i = 1; i <= n_users; i++) {
     let user = {
         email: faker.internet.email(),
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
         profilePicture: faker.image.urlLoremFlickr({
-            category: "portrait",
-            height: 500,
-            width: 500
+            category: "animal&&portrait",
+            height: 300,
+            width: 300
         }),
         googleOuthToken: "googleToken_" + i,
         stripeCustomerId: "stripeID_" + i,
         profileAsCoach: i % 2 === 0 ? {
             description: faker.lorem.paragraph(),
-            tagsOfSpecialties: faker.lorem.words(3).split(' '),
+            tagsOfSpecialties: [specialties[Math.floor(Math.random() * specialties.length)], specialties[Math.floor(Math.random() * specialties.length)]],
             sessionDuration: faker.number.int({ min: 30, max: 120 }),
             sessionPrice: faker.commerce.price()
         } : null,
         profileAsCoachee: i % 2 !== 0 ? {
             description: faker.lorem.paragraph(),
-            tagsOfGoals: ["StrengthBuilding", "Wellness"]
+            tagsOfGoals: [goals[Math.floor(Math.random() * goals.length)], goals[Math.floor(Math.random() * goals.length)]]
         } : null
     };
 
@@ -55,11 +58,11 @@ for (let i = 1; i <= n_users; i++) {
 
 db.createCollection("sessions");
 
-var sessionStatuses = ["SCHEDULED", "CANCELLED", "COMPLETED"];
+let sessionStatuses = ["SCHEDULED", "CANCELLED", "COMPLETED"];
 
 // Fetch Coach and Coachee IDs
-var coachIds = db.users.find({ isCoach: true }).toArray().map(user => user._id);
-var coacheeIds = db.users.find({ isCoachee: true }).toArray().map(user => user._id);
+let coachIds = db.users.find({ profileAsCoach: { $exists: true } }).toArray().map(user => user._id);
+let coacheeIds = db.users.find({ profileAsCoachee: { $exists: true } }).toArray().map(user => user._id);
 
 for (let i = 0; i < n_sessions; i++) {
     // Randomly select a coach and a coachee
@@ -79,22 +82,22 @@ for (let i = 0; i < n_sessions; i++) {
     if (randomStatus === "COMPLETED") {
         // Create a review object if the session is completed
         review = {
-            text: "Great session!",
+            text: faker.lorem.sentences(3),
             rating: Math.floor(Math.random() * 5) + 1, // Random rating between 1 and 5
-            createdAt: new Date() // Current date-time
+            createdAt: faker.date.anytime()
         };
     } else {
         // Set review to null if the session is not completed
         review = null;
     }
 
-    // Create a session and insert it
+    // Create a session and insert it t
     let session = {
         coachId: randomCoachId,
         coacheeId: randomCoacheeId,
         dateTime: new Date(), // Replace with actual logic for date-time
         status: randomStatus,
-        location: "Location_" + i,
+        location: faker.location.streetAddress(),
         googleCalendarEventId: "gcal_" + i,
         receipt: receipts,
         review: review
