@@ -7,6 +7,8 @@ import "./bookings.css"
 import { useAuthContext } from '../../auth/auth';
 import { useLocation } from 'react-router-dom';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
+import { createCheckoutSession } from '../../../server/stripe';
+import { duration } from 'moment/moment';
 
 function Bookings() {
     const location = useLocation();
@@ -55,6 +57,23 @@ function Bookings() {
         } catch (error) {
             console.log(error);
         }
+
+        const dummy = [
+            {
+                price_data: {
+                currency: 'sgd',
+                product_data: {
+                    name: 'T-shirt',
+                },
+                unit_amount: 2000,
+                },
+                quantity: 1,
+            },
+        ];
+
+        const connectedAccountId = 'test';
+
+        const stripeSession = await createCheckoutSession(dummy, connectedAccountId, '/#/listings', '/#/bookings');
     }
 
     return (
