@@ -9,6 +9,7 @@ import ModalForSessionCancellation from "../../modals/ModalForSessionCancellatio
 
 
 const ListingsForSessionsUpcoming = ({ userId }) => {
+    console.log('UserId in upcoming listings: ', userId);
 
     //############################################
     // VARIABLES
@@ -133,7 +134,7 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
                     onConfirm={handleConfirmCancellation}
                     onCancel={handleCloseModal}
                 />
-            )}>
+            )}
         </div>
     );
 };

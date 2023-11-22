@@ -98,7 +98,7 @@ function Bookings() {
                         <div class="col">
                             
                             <div class="row mb-3">
-                                <label className="form-label mt-2 mb-1 fw-bold">Session Location (TODO: WHERE TO GET LOCATION?)</label>
+                                <label className="form-label mt-2 mb-1 fw-bold">Session Location</label>
                                 <div className='text-wrap'>
                                     <text>{ coach.profileAsCoach.location }</text>
                                 </div>

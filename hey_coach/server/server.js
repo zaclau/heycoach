@@ -167,10 +167,8 @@ async function getAllSessionsForUserResolver(_, { userId }) {
     if (!userId) throw new Error("UserId is required");
 
     try {
-        const userIdObj = new ObjectId(userId);
-        const query = { $or: [{ coachId: userIdObj }, { coacheeId: userIdObj }] };
+        const query = { $or: [{ coachId: userId }, { coacheeId: userId }] };
         const sessions = await db.collection('sessions').find(query).toArray();
-
         console.log("Sessions for User:", sessions);
 
         if (!sessions) return null;

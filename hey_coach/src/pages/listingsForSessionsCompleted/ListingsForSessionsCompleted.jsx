@@ -142,7 +142,7 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
                     onConfirm={handleReviewSubmit}
                     onCancel={handleCloseModal}
                 />
-            )}>
+            )}
         </div>
     );
 };
