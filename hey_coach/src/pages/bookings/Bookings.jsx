@@ -14,6 +14,7 @@ function Bookings() {
     const location = useLocation();
     const userManagement = useAuthContext();
     const coach = location.state.coach;
+    console.log('Coach object in Bookings: ', coach);
     
     const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -92,7 +93,7 @@ function Bookings() {
                         <div class="col">
                             <div class="row mb-3">
                                 <label className="form-label mt-2 mb-1 fw-bold">Session Date & Time</label>
-                                <div class="col-7" id="calendar">
+                                <div id="calendar">
                                     <CalendarPicker calendar={ calendar } setCalendar={ setCalendar } />
                                 </div>
                                 {errors.password && <ErrorMessage message={errors.password?.message} />}
@@ -116,28 +117,10 @@ function Bookings() {
                         <div class="col">
                             
                             <div class="row mb-3">
-                                <label className="form-label mt-2 mb-1 fw-bold">Session Location (TODO: WHERE TO GET LOCATION?)</label>
-                                <div>
-                                    <div style={{whiteSpace : 'nowrap'}}>
-                                        <label for="loc1">Unit</label>
-                                        &nbsp;
-                                        <text>#08-405</text>
-                                    </div>
-                                    <div style={{whiteSpace : 'nowrap'}}>
-                                        <label for="loc2">Building Name</label>
-                                        &nbsp;
-                                        <text>Fernavle Vista</text>
-                                    </div>
-                                    <div style={{whiteSpace : 'nowrap'}}>
-                                        <label for="loc1">Street Name</label>
-                                        &nbsp;
-                                        <text>Jalan Kayu, Singapore</text>
-                                    </div>
+                                <label className="form-label mt-2 mb-1 fw-bold">Session Location</label>
+                                <div className='text-wrap'>
+                                    <text>{ coach.profileAsCoach.location }</text>
                                 </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label for="messagetocoach" class="form-label fw-bold">Message to Coach</label>
-                                <textarea class="form-control" id="messagetocoach" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="col">

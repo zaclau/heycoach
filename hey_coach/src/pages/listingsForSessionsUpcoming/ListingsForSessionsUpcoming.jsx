@@ -5,10 +5,11 @@ import { graphQLFetch } from '../../graphQL/graphQLFetch';
 
 // COMPONENETS
 import ListingCardForSession from "../../components/listingCardForSession/ListingCardForSession";
-import ModelForSessionCancellation from "../../modals/ModelForSessionCancellation";
+import ModalForSessionCancellation from "../../modals/ModalForSessionCancellation/ModalForSessionCancellation";
 
 
 const ListingsForSessionsUpcoming = ({ userId }) => {
+    console.log('UserId in upcoming listings: ', userId);
 
     //############################################
     // VARIABLES
@@ -19,7 +20,6 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
     const [currentSession, setCurrentSession] = useState(null); // TODO: what is currentSession For?
     const navigate = useNavigate();
 
-    // TODO replace with userId from context
     useEffect(() => {
         fetchSessions();
     }, [userId]);
@@ -36,7 +36,6 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
 
     const handleConfirmCancellation = async () => {
         console.log("session cancelled", currentSession);
-        // TODO: add logic to update DB using updateSession. Status to be "CANCELLED"
         const updateSessionQuery = `
         mutation UpdateExistingSession($sessionId: ID!, $updatedSessionDetails: InputCoachSession) {
           updateExistingSession(sessionId: $sessionId, updatedSessionDetails: $updatedSessionDetails) {
@@ -54,8 +53,8 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
         }
         const data = await graphQLFetch(updateSessionQuery, vars);
         console.log("Session status updated", data);
-        await fetchSessions();
         setShowModal(false);
+        await fetchSessions();
     }
 
     const handleCloseModal = () => {
@@ -130,12 +129,12 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
                 />
             ))}
             {showModal && (
-                <ModelForSessionCancellation
+                <ModalForSessionCancellation
                     show = {showModal}
                     onConfirm={handleConfirmCancellation}
                     onCancel={handleCloseModal}
                 />
-            )}>
+            )}
         </div>
     );
 };

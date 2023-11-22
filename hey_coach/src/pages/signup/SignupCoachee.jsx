@@ -73,7 +73,7 @@ function SignupCoachee() {
             console.log('New user created from Signup Coach: ', newUser);
             if (newUser.signUpUser) {
                 userManagement.signInUser(newUser.signUpUser);    // Start user session
-                navigate('/listings');
+                navigate('/');
             } // might need else clause to throw error
         } catch (error) {
             console.log(error);

@@ -47,16 +47,18 @@ type PreferredDay {
 }
 
 type CoachProfile {
-  "Description of the coach. Can be long text."
-  description: String!
-  "Freeform tag of specialities"
-  tagsOfSpecialties: [String]
-  "Placeholder. Potentially removed with calendly"
-  sessionSlotsAvailable: [PreferredDay]
-  "Default session duration"
-  sessionDuration: Int
-  "Default session price"
-  sessionPrice: Float
+    "Description of the coach. Can be long text."
+    description: String!
+    "Freeform tag of specialities"
+    tagsOfSpecialties: [String]
+    "Placeholder. Potentially removed with calendly"
+    sessionSlotsAvailable: [PreferredDay]
+    "Default session duration"
+    sessionDuration: Int
+    "Default session price"
+    sessionPrice: Float
+    "Location of the coach"
+    location: String
 }
 
 enum SessionGoal {
@@ -136,11 +138,12 @@ input InputsForUserProfile {
 }
 
 input InputCoachProfile {
-  description: String
-  tagsOfSpecialties: [String]
-  sessionSlotsAvailable: [InputPreferredDay]
-  sessionDuration: Int
-  sessionPrice: Float
+    description: String
+    tagsOfSpecialties: [String]
+    sessionSlotsAvailable: [InputPreferredDay]
+    sessionDuration: Int
+    sessionPrice: Float
+    location: String
 }
 
 input InputCoacheeProfile {
