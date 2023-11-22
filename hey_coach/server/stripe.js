@@ -1,5 +1,5 @@
-import { Redirect } from 'react-router-dom';
-
+import { concatAST } from 'graphql';
+import { graphQLFetch } from '../src/graphQL/graphQLFetch';
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET_KEY, {
   apiVersion: process.env.REACT_APP_STRIPE_API_VERSION
 });
@@ -135,6 +135,13 @@ async function createStripeAccount(user, refresh_url, return_url) {
 
     // Create a new Stripe account
     const account = await stripe.accounts.create(accountParams);
+    user.stripeCustomerId = account.id;
+    console.log('account: ', account.id);
+    console.log('user: ', user);
+    const updatedUser = await updateStripeID(user);
+    console.log('updatedUser: ', updatedUser);
+    // Update and store the Stripe account ID in the datastore:
+    // this Stripe account ID will be used to issue payouts to the user
 
     // Create an account link for the user's Stripe account
     const accountLink = await stripe.accountLinks.create({
@@ -148,7 +155,6 @@ async function createStripeAccount(user, refresh_url, return_url) {
     window.location.href = accountLink.url;
     //<Redirect to={accountLink.url} />;
 
-    return account;
   } catch (error) {
     // Handle errors here if needed
     console.error('Error creating Stripe account:', error.message);
@@ -156,31 +162,25 @@ async function createStripeAccount(user, refresh_url, return_url) {
     throw error;
   }
 }
-// accountId = account.id;
-// Update and store the Stripe account ID in the datastore:
-// this Stripe account ID will be used to issue payouts to the user
 
 // Function to create a checkout payment flow
-const session = await stripe.checkout.sessions.create
-(
-  {
+const createCheckoutSession = async ({ items, connectedAccountId, successUrl, cancelUrl }) => {
+  const session = await stripe.checkout.sessions.create({
     mode: 'payment',
-    line_items: [
-      {
-        price: '{{PRICE_ID}}',
-        quantity: 1,
-      },
-    ],
+    line_items: items,
     payment_intent_data: {
       application_fee_amount: 10,
     },
-    success_url: process.env.REACT_APP_DOMAIN + success_url,
-    cancel_url: process.env.REACT_APP_DOMAIN + cancel_url,
+    success_url: process.env.REACT_APP_DOMAIN + successUrl,
+    cancel_url: process.env.REACT_APP_DOMAIN + cancelUrl,
   },
   {
-    stripeAccount: '{{CONNECTED_ACCOUNT_ID}}',
-  }
-);
+    stripeAccount: connectedAccountId,
+  });
+
+  window.location.href = session.url;
+};
+
 
 // Function to retrieve the user's Stripe account and check if they have finished onboarding
 async function checkStripeAccountOnboarding(user, res) {
@@ -199,7 +199,6 @@ async function checkStripeAccountOnboarding(user, res) {
     res.status(500).send('Internal Server Error');
   }
 }
-
 
 // Function to generate a unique login link for the associated Stripe account to access their Express dashboard
 async function generateAndRedirectToStripeDashboard(req, res, user) {
@@ -225,4 +224,38 @@ async function generateAndRedirectToStripeDashboard(req, res, user) {
   }
 }
 
-export { getCurrencySymbol, getStripeBalance, createStripePayout, createStripeChargeAndTransfer, createStripeAccount, checkStripeAccountOnboarding, generateAndRedirectToStripeDashboard };
+// Create new User with Coach Profile
+async function updateStripeID(data) {
+  const updateUserProfileMutation = `
+      mutation updateUserProfile($userId: ID!, $updatedProfile: InputsForUserProfile!) {
+          updateUserProfile(userId: $userId, updatedProfile: $updatedProfile) {
+              _id
+              email
+              firstName
+              lastName
+              stripeCustomerId
+          }
+      }
+  `;
+
+  const email = data.email;
+  const firstName = data.firstName;
+  const stripeCustomerId = data.stripeCustomerId
+  const userProfileInput = {
+      userId: data._id,
+      updatedProfile: {
+        email,
+        firstName,
+        stripeCustomerId
+      }
+  };
+
+  try {
+    const updatedUser = await graphQLFetch(updateUserProfileMutation, userProfileInput);
+    return updatedUser;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export { getCurrencySymbol, getStripeBalance, createStripePayout, createStripeChargeAndTransfer, createStripeAccount, createCheckoutSession, checkStripeAccountOnboarding, generateAndRedirectToStripeDashboard };

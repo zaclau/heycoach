@@ -92,8 +92,6 @@ function SignupCoach() {
                 console.log('localstorage: ', JSON.stringify(newUser.signUpUser));
                 // Create Stripe Account
                 const stripeAccount = await createStripeAccount(newUser.signUpUser, '/#/signup/coach', '/#/signup/coach');
-                // Update User with Stripe Account ID
-                console.log('Stripe Account: ', stripeAccount);
                 //navigate('/listings');
             } // might need else clause to throw error
         } catch (error) {

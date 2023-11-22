@@ -1,78 +1,77 @@
-
 # V2 - central user collection (private), seperate profile collections (safe for public)
 ############################################
 # TYPES
 ############################################
 
-scalar DateTime  # referencing GraphQL Scalars package, https://the-guild.dev/graphql/scalars/docs/usage
+scalar DateTime # referencing GraphQL Scalars package, https://the-guild.dev/graphql/scalars/docs/usage
 scalar LocalTime
 
 #################
-# PEOPLE objects 
+# PEOPLE objects
 #################
 "Represents all users in the system. See profiles for flags"
-type User{
-    "User ID"
-    _id: ID!
-    "Email a string"
-    email: String!
-    "First Name"
-    firstName: String!
-    "Last Name"
-    lastName: String
-    "Image URL"
-    profilePicture: String
+type User {
+  "User ID"
+  _id: ID!
+  "Email a string"
+  email: String!
+  "First Name"
+  firstName: String!
+  "Last Name"
+  lastName: String
+  "Image URL"
+  profilePicture: String
 
-    # TOKENS
-    googleOuthToken: String
-    stripeCustomerId: String
+  # TOKENS
+  googleOuthToken: String
+  stripeCustomerId: String
 
-#    # LOGS
-#    "Timestamp for datetime"
-#    loggedCreatedAt: DateTime
+  #    # LOGS
+  #    "Timestamp for datetime"
+  #    loggedCreatedAt: DateTime
 
-    # Profiles
-    "Profiles. Used for cards, etc"
-    profileAsCoach: CoachProfile
-    profileAsCoachee: CoacheeProfile
+  # Profiles
+  "Profiles. Used for cards, etc"
+  profileAsCoach: CoachProfile
+  profileAsCoachee: CoacheeProfile
 }
 
-type PreferredTimeSlot{
-    start: LocalTime  # Format: "HH:mm"
-    end: LocalTime
+type PreferredTimeSlot {
+  start: LocalTime # Format: "HH:mm"
+  end: LocalTime
 }
 
 type PreferredDay {
-    day: String
-    slots: [PreferredTimeSlot]
+  day: String
+  slots: [PreferredTimeSlot]
 }
 
 type CoachProfile {
-    "Description of the coach. Can be long text."
-    description: String!
-    "Freeform tag of specialities"
-    tagsOfSpecialties: [String]
-    "Placeholder. Potentially removed with calendly"
-    sessionSlotsAvailable: [PreferredDay]
-    "Default session duration"
-    sessionDuration: Int
-    "Default session price"
-    sessionPrice: Float
+  "Description of the coach. Can be long text."
+  description: String!
+  "Freeform tag of specialities"
+  tagsOfSpecialties: [String]
+  "Placeholder. Potentially removed with calendly"
+  sessionSlotsAvailable: [PreferredDay]
+  "Default session duration"
+  sessionDuration: Int
+  "Default session price"
+  sessionPrice: Float
 }
 
 enum SessionGoal {
-    StrengthBuilding
-    EnduranceBuilding
-    AgilityBuilding
-    FatBurn
-    Wellness
-    MentalFocus
+  StrengthBuilding
+  EnduranceBuilding
+  AgilityBuilding
+  FatBurn
+  Wellness
+  MentalFocus
 }
 
 type CoacheeProfile {
-    description: String!
-    sessionSlotsPreferred: [PreferredDay]
-    tagsOfGoals: [SessionGoal]! # can link to GPT3.5 or vector search later to match with coach type
+  description: String!
+  sessionSlotsPreferred: [PreferredDay]
+  tagsOfGoals: [SessionGoal]! # can link to GPT3.5 or vector search later to match with coach type
 }
 
 ###############
@@ -80,109 +79,106 @@ type CoacheeProfile {
 ###############
 
 type CoachingSession {
-    _id: ID!
+  _id: ID!
 
-    # Participant References
-    coachId: ID!           # Reference to the coach's ID
-    coacheeId: ID!         # Reference to the coachee's ID
-
-    # Session Details
-    dateTime: DateTime!    # Date and time of the coaching session
-    status: StatusOfSession! # Status of the session (Scheduled, Cancelled, Completed, etc.)
-    location: String       # Location of the session
-    googleCalendarEventId: String # ID for the event in Google Calendar or other scheduling solutions
-
-    # Financial Information
-    receipt: [Receipt]       # Receipt information for the session
-
-    # Post-Session Review
-    review: Review  # Review of the session (nullable, as it's post-session data)
+  # Participant References
+  coachId: ID! # Reference to the coach's ID
+  coacheeId: ID! # Reference to the coachee's ID
+  # Session Details
+  dateTime: DateTime! # Date and time of the coaching session
+  status: StatusOfSession! # Status of the session (Scheduled, Cancelled, Completed, etc.)
+  location: String # Location of the session
+  googleCalendarEventId: String # ID for the event in Google Calendar or other scheduling solutions
+  # Financial Information
+  receipt: [Receipt] # Receipt information for the session
+  # Post-Session Review
+  review: Review # Review of the session (nullable, as it's post-session data)
 }
 
 type Receipt {
-    _id: ID!
-    stripeId: String!
-    amount: Float
-    status: StatusOfPayment!
+  _id: ID!
+  stripeId: String!
+  amount: Float
+  status: StatusOfPayment!
 }
 
 type Review {
-    _id: ID!
-    text: String!
-    rating: Int!
-    createdAt: DateTime
+  _id: ID!
+  text: String!
+  rating: Int!
+  createdAt: DateTime
 }
 
 enum StatusOfSession {
-    SCHEDULED
-    CANCELLED
-    COMPLETED
+  SCHEDULED
+  CANCELLED
+  COMPLETED
 }
 
 enum StatusOfPayment {
-    PENDING
-    COMPLETED
-    FAILED
+  PENDING
+  COMPLETED
+  FAILED
 }
-
 
 ############################################
 # INPUTS
 ############################################
 
 input InputsForUserProfile {
-    email: String!
-    firstName: String!
-    lastName: String
-    profilePicture: String
-    profileAsCoach: InputCoachProfile
-    profileAsCoachee: InputCoacheeProfile
+  email: String!
+  firstName: String!
+  lastName: String
+  profilePicture: String
+  profileAsCoach: InputCoachProfile
+  profileAsCoachee: InputCoacheeProfile
+  stripeCustomerId: String
 }
 
 input InputCoachProfile {
-    description: String
-    tagsOfSpecialties: [String]
-    sessionSlotsAvailable: [InputPreferredDay]
-    sessionDuration: Int
-    sessionPrice: Float
+  description: String
+  tagsOfSpecialties: [String]
+  sessionSlotsAvailable: [InputPreferredDay]
+  sessionDuration: Int
+  sessionPrice: Float
 }
 
 input InputCoacheeProfile {
-    description: String
-    sessionSlotsPreferred: [InputPreferredDay]
-    tagsOfGoals: [SessionGoal]
+  description: String
+  sessionSlotsPreferred: [InputPreferredDay]
+  tagsOfGoals: [SessionGoal]
 }
 
 input InputPreferredDay {
-    day: String
-    slots: [InputPreferredTime]
+  day: String
+  slots: [InputPreferredTime]
 }
 
 input InputPreferredTime {
-    start: String  # Format: "HH:mm"
-    end: String
+  start: String # Format: "HH:mm"
+  end: String
 }
 
 input InputCoachSession {
-    coachId: ID
-    coacheeId: ID
-    dateTime: DateTime # using graphql-scalars
-    status: StatusOfSession
-    location: String
-    review: InputReview
-    receipt: [InputReceipt]
+  coachId: ID
+  coacheeId: ID
+  dateTime: DateTime # using graphql-scalars
+  status: StatusOfSession
+  location: String
+  review: InputReview
+  receipt: [InputReceipt]
 }
 
 input InputReview {
-    text: String
-    rating: Int
-    createdAt: DateTime
+  text: String
+  rating: Int
+  createdAt: DateTime
 }
 
 input InputReceipt {
-    stripeId: String
-    amount: Float
-    status: StatusOfPayment
+  stripeId: String
+  amount: Float
+  status: StatusOfPayment
 }
 
 ############################################
@@ -190,60 +186,54 @@ input InputReceipt {
 ############################################
 
 type Query {
-    
-    ################
-    # User Queries
-    ################
+  ################
+  # User Queries
+  ################
 
-    getUserByEmail(email: String!): User  # implemented
-    getUserById(userId: ID!): User  # implemented
-    getAllUsers: [User]  # implemented
-    getAllCoaches: [User]  # implemented, tested
-    getAllCoachees: [User]  # implemented, tested
+  getUserByEmail(email: String!): User # implemented
+  getUserById(userId: ID!): User # implemented
+  getAllUsers: [User] # implemented
+  getAllCoaches: [User] # implemented, tested
+  getAllCoachees: [User] # implemented, tested
+  ################
+  # Session Queries
+  ################
 
-    ################
-    # Session Queries
-    ################
+  getAllSessions: [CoachingSession] # implemented
+  getSessionById(sessionId: ID!): CoachingSession
+  getAllSessionsForUser(userId: ID!): [CoachingSession] # implemented
 
-    getAllSessions: [CoachingSession]  # implemented
-    getSessionById(sessionId: ID!): CoachingSession
-    getAllSessionsForUser(userId: ID!): [CoachingSession]  # implemented
+  ################
+  # Deprecated
+  ################
 
-    ################
-    # Deprecated
-    ################
-
-#    getAllReceipts: [Receipt]  # implemented - removed with new schema
-#    getAllReviews: [Review]  # implemented - reomoved with new schema
-#    getReceiptById(receiptId: ID!): Receipt  # removed with new schema
-#    getReviewById(receiptId: ID!): Receipt  # removed with new schema
+  #    getAllReceipts: [Receipt]  # implemented - removed with new schema
+  #    getAllReviews: [Review]  # implemented - reomoved with new schema
+  #    getReceiptById(receiptId: ID!): Receipt  # removed with new schema
+  #    getReviewById(receiptId: ID!): Receipt  # removed with new schema
 }
-
 
 ############################################
 # MUTATIONS
 ############################################
 
 type Mutation {
-    "Sign up a new user with basic information"
-    signUpUser(newUser: InputsForUserProfile!): User  # implemented
+  "Sign up a new user with basic information"
+  signUpUser(newUser: InputsForUserProfile!): User # implemented
+  "Update the profile of an existing user"
+  updateUserProfile(userId: ID!, updatedProfile: InputsForUserProfile!): User # implemented
+  "Create a new coaching session"
+  createNewSession(newSession: InputCoachSession!): CoachingSession # implemented, tested
+  "Update a session: e.g. change time, cancel, etc"
+  updateExistingSession(
+    sessionId: ID!
+    updatedSessionDetails: InputCoachSession
+  ): CoachingSession # implemented, tested
 
-    "Update the profile of an existing user"
-    updateUserProfile(userId: ID!, updatedProfile: InputsForUserProfile!): User # implemented
-
-    "Create a new coaching session"
-    createNewSession(newSession: InputCoachSession!): CoachingSession # implemented, tested
-
-    "Update a session: e.g. change time, cancel, etc"
-    updateExistingSession(sessionId: ID!, updatedSessionDetails: InputCoachSession): CoachingSession # implemented, tested
-
-    ####################
-    # THINGS TO CONSIDER
-    ####################
-    # deleteEntireProfile(userId)
-    # deleteCoachProfile(userId)
-    # deleteCoacheeProfile(userId)
-
+  ####################
+  # THINGS TO CONSIDER
+  ####################
+  # deleteEntireProfile(userId)
+  # deleteCoachProfile(userId)
+  # deleteCoacheeProfile(userId)
 }
-
-
