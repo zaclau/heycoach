@@ -21,12 +21,16 @@ import { useNavigate, useLocation } from 'react-router';
 import ListingCard from '../../components/listingCard/ListingCard';
 import SearchBar from '../../components/searchBar/SearchBar';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
+import { useAuthContext } from '../../auth/auth';
 
 const Listings = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [coaches, setCoaches] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
+
+    const userManagement = useAuthContext();
+    console.log('userManagement: ', userManagement);
 
     // Listings.jsx
     useEffect(() => {

@@ -56,6 +56,7 @@ function SignupCoachee() {
         const lastName = location.state.lastName;
         const profilePicture = location.state.profilePicture;
         const description = data.description;
+        const tagsOfGoals = ["Wellness"]; // hardcoded for now
         const userProfileInput = {
             newUser: {email,
             firstName,
@@ -63,6 +64,7 @@ function SignupCoachee() {
             profilePicture,
             profileAsCoachee: {
                 description,
+                tagsOfGoals,
             }}
         };
 

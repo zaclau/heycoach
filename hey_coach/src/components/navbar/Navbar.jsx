@@ -32,7 +32,13 @@ const Navbar = () => {
             </a>
             <div className="navItems">
                 {userManagement && userManagement.userStore 
-                    ? <button className="btn btn-link link-dark fw-bold" onClick={ goLogout }>Logout</button>
+                    ? <button className="btn btn-link link-dark fw-bold" onClick={ goLogout }>
+                        <img 
+                          className='rounded-circle me-1 pe-1' 
+                          width="30px"
+                          src={ userManagement.userStore.profilePicture }></img>
+                        Logout
+                      </button>
                     : <button className="btn btn-link link-dark fw-bold" onClick={ goLogin }>Login/Signup with Google</button>
                 }
             </div>

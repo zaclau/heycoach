@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from "react-hook-form"
 import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 import { useAuthContext } from '../../auth/auth';
+import { createStripeAccount } from '../../../server/stripe';
 
 function SignupCoach() {
     const userManagement = useAuthContext();
     const location = useLocation();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (localStorage.getItem('user')) {
+            userManagement.signInUser(localStorage.getItem('user'));    // Start user session
+            console.log('localstorage: ', localStorage.getItem('user'));
+            navigate('/listings');
+            if (localStorage.getItem('user')) {
+                localStorage.clear();
+                navigate('/listings');
+            }   
+        }
+    }, []);
     
     const { register, handleSubmit, formState: { errors } } = useForm();    // See https://www.react-hook-form.com/get-started/#ReactWebVideoTutorial
     const formSubmit = async (data) => {
@@ -75,7 +88,13 @@ function SignupCoach() {
             console.log('New user created from Signup Coach: ', newUser);
             if (newUser.signUpUser) {
                 userManagement.signInUser(newUser.signUpUser);    // Start user session
-                navigate('/listings');
+                localStorage.setItem('user', JSON.stringify(newUser.signUpUser));
+                console.log('localstorage: ', JSON.stringify(newUser.signUpUser));
+                // Create Stripe Account
+                const stripeAccount = await createStripeAccount(newUser.signUpUser, '/#/signup/coach', '/#/signup/coach');
+                // Update User with Stripe Account ID
+                console.log('Stripe Account: ', stripeAccount);
+                //navigate('/listings');
             } // might need else clause to throw error
         } catch (error) {
             console.log(error);
@@ -102,7 +121,7 @@ function SignupCoach() {
                     <input {...register("sessionPrice", {required: 'Session price is required.'})} className="form-control text-white bg-dark rounded-pill" placeholder="Session Price" type="number" step="0.01" min="0" ></input>
                     {errors.sessionPrice && <ErrorMessage message={errors.sessionPrice?.message} />}
                     
-                    <input type="submit" value="Proceed" className="form-control btn btn-light mt-4"/>
+                    <input type="submit" value="Proceed to Payment setup" className="form-control btn btn-light mt-4"/>
                     
                     <hr></hr>
                 </form>
