@@ -77,10 +77,10 @@ function SignupCoach() {
             if (newUser.signUpUser) {
                 userManagement.signInUser(newUser.signUpUser);    // Start user session
                 // Create Stripe Account
-                const stripeAccountId = await createStripeAccount(newUser.signUpUser, '/signup/coach', '/listings');
+                const stripeAccountId = await createStripeAccount(newUser.signUpUser, '/signup/coach', '/#/listings');
                 console.log('Stripe Account ID: ', stripeAccountId);
                 // Update User with Stripe Account ID
-                navigate('/listings');
+                // navigate('/listings');
             } // might need else clause to throw error
         } catch (error) {
             console.log(error);
