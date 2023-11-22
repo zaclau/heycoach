@@ -130,15 +130,16 @@ function CoachProfile() {
                 <h3 className="fw-semibold mt-4">What Others Say</h3>
                 <div className="container">
 
-                    {validSessions.map(session => (
-                        <ReviewComments
-                            // key={session._id}
-                            coacheeProfileUrl={session.coacheeDetails.profilePicture}
-                            coacheeName= {session.coacheeDetails.firstName + " " + session.coacheeDetails.lastName}
-                            reviewDescription={session.review.text}
-                            reviewScore={session.review.rating}
-                        />
-                    ))}
+                    {validSessions 
+                        ? validSessions.map(session => (
+                            <ReviewComments
+                                // key={session._id}
+                                coacheeProfileUrl={session.coacheeDetails.profilePicture}
+                                coacheeName= {session.coacheeDetails.firstName + " " + session.coacheeDetails.lastName}
+                                reviewDescription={session.review.text}
+                                reviewScore={session.review.rating}
+                            />)) 
+                        : <text>No reviews found.</text>}
                 </div>
             </div>
         </>

@@ -11,6 +11,7 @@ import CoachProfile from "./pages/coachProfile/CoachProfile.jsx";
 import SignupCoach from "./pages/signup/SignupCoach.jsx";
 import SignupCoachee from "./pages/signup/SignupCoachee.jsx";
 import UserLanding from "./pages/userLanding/UserLanding";
+import Settings from './pages/settings/Settings.jsx';
 import { AuthRequired } from './auth/auth.jsx';
 
 const NotFound = () => <h1>Page Not Found</h1>;
@@ -23,8 +24,12 @@ function Contents() {
       <Route path="/signup/coach" element={ <SignupCoach /> } />
       <Route path="/signup/user" element={ <SignupCoachee /> } />
       <Route path="/login" element={<Login />} />
+      <Route path="/settings" element={
+        <AuthRequired>
+          <Settings />
+        </AuthRequired>} />
       <Route path="/listings" element={<Listings />} />
-      <Route path="/userLanding" element={<UserLanding />} />
+      {/* <Route path="/userLanding" element={<UserLanding />} /> */}
       <Route path="/bookings" element={
         <AuthRequired>
           <Bookings />
