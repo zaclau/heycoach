@@ -160,6 +160,27 @@ async function createStripeAccount(user, refresh_url, return_url) {
 // Update and store the Stripe account ID in the datastore:
 // this Stripe account ID will be used to issue payouts to the user
 
+// Function to create a checkout payment flow
+const session = await stripe.checkout.sessions.create
+(
+  {
+    mode: 'payment',
+    line_items: [
+      {
+        price: '{{PRICE_ID}}',
+        quantity: 1,
+      },
+    ],
+    payment_intent_data: {
+      application_fee_amount: 10,
+    },
+    success_url: process.env.REACT_APP_DOMAIN + success_url,
+    cancel_url: process.env.REACT_APP_DOMAIN + cancel_url,
+  },
+  {
+    stripeAccount: '{{CONNECTED_ACCOUNT_ID}}',
+  }
+);
 
 // Function to retrieve the user's Stripe account and check if they have finished onboarding
 async function checkStripeAccountOnboarding(user, res) {
