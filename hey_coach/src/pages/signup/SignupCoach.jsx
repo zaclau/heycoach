@@ -13,7 +13,7 @@ function SignupCoach() {
 
     useEffect(() => {
         if (localStorage.getItem('user')) {
-            userManagement.signInUser(localStorage.getItem('user'));    // Start user session
+            userManagement.signInUser(JSON.parse(localStorage.getItem('user')));    // Start user session
             console.log('localstorage: ', localStorage.getItem('user'));
             localStorage.clear();
             navigate('/');
