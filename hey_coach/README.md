@@ -8,6 +8,7 @@
 4. The platform also handles payments for sessions, with coaches receiving direct payments from coachees.
 
 #### ⭐️ Key Features
+!["landing"](./archive/landing.gif)
 - **Seamless Account Creation**: Integrated Google Authentication for streamlined user sign-up and sign-in processes.
 - **Automated Coach Compensation**: Integrated Stripe API for the creation of coach accounts to facilitate direct payments, managed at the point of account creation.
 - **Simplified Payments for Coachees**: Enabled easy payment processing for coachee transactions via Stripe, without the need for account setup.
@@ -15,11 +16,13 @@
 - **Efficient Booking System**: Designed a user-friendly booking interface with integrated calendar functionality for convenient scheduling.
 - **Synthetic Data Generation for Testing**: Utilized FakerJS within an initmongo.js script for the creation of mock accounts and session data to test system robustness.
 - **Data Security and Query Efficiency**: Employed MongoDB in tandem with GraphQL to execute efficient data queries, ensuring a separation of sensitive and general data.
-- **Engaging User Experience**: Adopted React for dynamic component-based UI/UX design, with Bootstrap and custom CSS to match the original Figma design specifications.
+- **Engaging User Experience**: Adopted React for dynamic component-based UI/UX design, with Bootstrap and custom CSS to match the original Figma design specifications. See [UIUX Planning](./archive/HeyCoach-SolutionArchitecture.pdf)
 - **Advanced Navigation and State Management**: Implemented React Router for seamless navigation and used React context, hooks, and local storage for state persistence.
 - **Session Management Interface**: Created interactive modals for real-time session management by coaches.
+
   
 #### 🥪 Technology Stack and APIs:
+!["UserDash"](./archive/userDash.gif)
 - Database: MongoDB
 - Server: Node.js with Express framework
 - Frontend: React, including React Router for routing
