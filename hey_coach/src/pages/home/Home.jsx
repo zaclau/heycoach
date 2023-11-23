@@ -15,11 +15,13 @@ const Home = () => {
     const _uid = userManagement && userManagement.userStore ? userManagement.userStore._id : null;
 
 
+  console.log('userManagement at HOME: ', userManagement);
+  console.log('userManagement.userStore at HOME: ', userManagement.userStore);
   return (
     <div>
-        <Header/>
-        {/*<h1>"USER LANDING"</h1>*/}
-        {_uid && <UserLanding/>}
+      <Header/>
+      {/*<h1>"USER LANDING"</h1>*/}
+      {_uid && <UserLanding/>}
     </div>
   );
 };
