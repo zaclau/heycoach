@@ -225,6 +225,8 @@ type Mutation {
   signUpUser(newUser: InputsForUserProfile!): User # implemented
   "Update the profile of an existing user"
   updateUserProfile(userId: ID!, updatedProfile: InputsForUserProfile!): User # implemented
+  "Delete a user account"
+  deleteUser(userId: ID!): Boolean # implemented, tested
   "Create a new coaching session"
   createNewSession(newSession: InputCoachSession!): CoachingSession # implemented, tested
   "Update a session: e.g. change time, cancel, etc"
@@ -236,7 +238,6 @@ type Mutation {
   ####################
   # THINGS TO CONSIDER
   ####################
-  # deleteEntireProfile(userId)
   # deleteCoachProfile(userId)
   # deleteCoacheeProfile(userId)
 }

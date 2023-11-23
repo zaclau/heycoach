@@ -66,6 +66,7 @@ const resolvers = {
         // User Mutations
         signUpUser: signUpUserResolver,
         updateUserProfile: updateUserProfileResolver,
+        deleteUser: deleteUserResolver,
 
         // Session Mutations
         createNewSession: createSessionResolver,
@@ -247,6 +248,18 @@ async function updateUserProfileResolver(_, args) {
     } catch (error) {
         console.error(`Error in updateUserProfile: ${error.message}`);
         throw new Error(`Error Thrown: ${error.message}`);
+    }
+}
+
+async function deleteUserResolver(_, args) {
+    try {
+        const { userId } = args;
+        const userIdObj = new ObjectId(userId);
+        const data = await db.collection('users').deleteOne({ _id: userIdObj });
+        console.log('User has been deleted? ', Boolean(data.deletedCount));
+        return Boolean(data.deletedCount);
+    } catch (error) {
+        throw new Error(`Error in getUserByEmailResolver: ${error.message}`);
     }
 }
 
