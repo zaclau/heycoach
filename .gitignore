@@ -24,3 +24,4 @@ hey_coach/public/*
 hey_coach/npm-debug.log*
 hey_coach/yarn-debug.log*
 hey_coach/yarn-error.log*
+hey_coach/public/app.bundle.js
