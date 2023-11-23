@@ -1,1 +1,26 @@
-hey_coach/public/app.bundle.js
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+hey_coach/node_modules
+hey_coach/.pnp
+hey_coach/.pnp.js
+
+# testing
+hey_coach/coverage
+
+# production
+hey_coach/build
+hey_coach/public/*
+!hey_coach/public/index.html
+
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+hey_coach/npm-debug.log*
+hey_coach/yarn-debug.log*
+hey_coach/yarn-error.log*
