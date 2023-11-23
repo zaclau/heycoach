@@ -167,7 +167,8 @@ async function getAllSessionsForUserResolver(_, { userId }) {
     if (!userId) throw new Error("UserId is required");
 
     try {
-        const query = { $or: [{ coachId: userId }, { coacheeId: userId }] };
+        let userIdObj = new ObjectId(userId);
+        const query = { $or: [{ coachId: userIdObj }, { coacheeId: userIdObj }] };
         const sessions = await db.collection('sessions').find(query).toArray();
         console.log("Sessions for User:", sessions);
 
@@ -177,28 +178,6 @@ async function getAllSessionsForUserResolver(_, { userId }) {
         throw new Error(`Error Thrown: ${error.message}`);
     }
 }
-
-
-// async function getAllSessionsForUserResolver(_, { userId }) {
-//     if (!userId) throw new Error("UserId is required");
-//
-//     try {
-//         const userIdObj = new ObjectId(userId);
-//         const query = { $or: [{ coachId: userIdObj }, { coacheeId: userIdObj }] };
-//         const sessions = await db.collection('sessions').find(query).toArray();
-//
-//         return sessions.map(session => ({
-//             ...session,
-//             _id: session._id.toString(),
-//             coachId: session.coachId.toString(),
-//             coacheeId: session.coacheeId.toString(),
-//             receipt: session.receipt.map(r => ({ ...r })),
-//             review: session.review ? { ...session.review } : null,
-//         }));
-//     } catch (error) {
-//         throw new Error(`Error Thrown: ${error.message}`);
-//     }
-// }
 
 // ############################################
 // RESOLVERS, MUTATIONS
@@ -214,12 +193,10 @@ async function signUpUserResolver(_, args) {
         // Create the return object by extracting the fields from newUser
         // and combining them with the generated _id
         const userToReturn = {
-            _id: result.insertedId.toString(), // Convert ObjectId to String
+            // _id: result.insertedId.toString(), // Convert ObjectId to String
+            _id: result.insertedId,
             ...newUser,
         };
-
-        // Exclude sensitive fields if any (like password) before returning
-        // For example: delete userToReturn.password;
 
         return userToReturn;
 
@@ -276,6 +253,9 @@ async function updateUserProfileResolver(_, args) {
 async function createSessionResolver(_, args) {
     try {
         const { newSession } = args;
+
+        newSession.coachId = new ObjectId(newSession.coachId);
+        newSession.coacheeId = new ObjectId(newSession.coacheeId);
 
         // Insert the new session into the database
         const result = await db.collection('sessions').insertOne(newSession);
