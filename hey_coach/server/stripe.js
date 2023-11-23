@@ -164,13 +164,12 @@ async function createStripeAccount(user, refresh_url, return_url) {
 }
 
 // Function to create a checkout payment flow
-const createCheckoutSession = async ({ items, connectedAccountId, successUrl, cancelUrl }) => {
+async function createCheckoutSession(items, connectedAccountId, successUrl, cancelUrl) {
+  console.log('hello from createCheckoutSession');
+  console.log('items: ', items);
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     line_items: items,
-    payment_intent_data: {
-      application_fee_amount: 10,
-    },
     success_url: process.env.REACT_APP_DOMAIN + successUrl,
     cancel_url: process.env.REACT_APP_DOMAIN + cancelUrl,
   },

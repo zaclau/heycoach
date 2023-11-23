@@ -4,70 +4,94 @@ import { useNavigate } from 'react-router';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 
 // COMPONENETS
-import ListingCardForSession from "../../components/listingCardForSession/ListingCardForSession";
-import ModalForReviews from "../../modals/ModalForReview/ModalForReviews";
+import ListingCardForSessionCompleted from "../../components/listingCard/ListingCardForSessionCompleted";
+import ModalForSessionCancellation from "../../modals/ModalForSessionCancellation/ModalForSessionCancellation";
+import ListingCardForSessionUpcoming
+    from "../../components/listingCard/ListingCardForSessionUpcoming";
 
-
-const ListingsForSessionsUpcoming = ({ userId, refreshTrigger }) => {
+const ListingsForSessionsUpcoming = ({ userId, onRefreshUpcoming }) => {
+    console.log('UserId in upcoming listings: ', userId);
 
     //############################################
     // VARIABLES
     //############################################
-
+    const [refreshUpcomingSessions, setRefreshUpcomingSessions] = useState(false);
     const [sessions, setSessions] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [currentSession, setCurrentSession] = useState(null); // TODO: what is currentSession For?
+    const [currentSession, setCurrentSession] = useState(null);
+    const [sessionComplete, setSessionComplete] = useState(false);
     const navigate = useNavigate();
 
-    // TODO replace with userId from context
     useEffect(() => {
         fetchSessions();
-    }, [userId, refreshTrigger]);
+    }, [userId]);
 
     //############################################
-    // MODAL HANDLERS
+    // HANDLERS - cancel w modal
     //############################################
 
-    const handleReviewClick = (session) => {
-        console.log("review clicked", session)
+    const handleCancelClick = (session) => {
+        console.log("cancel clicked", session)
         setCurrentSession(session);
         setShowModal(true);
     };
 
-    const handleReviewSubmit = async (reviewData) => {
-        console.log("review submission", currentSession);
-        const mutation = `
-            mutation UpdateExistingSession($sessionId: ID!, $updatedSessionDetails: InputCoachSession!) {
-                updateExistingSession(sessionId: $sessionId, updatedSessionDetails: $updatedSessionDetails) {
-                    _id
-                    review {
-                        text
-                        rating
-                    }
-                }
-            }
+    const handleConfirmCancellation = async () => {
+        console.log("session cancelled", currentSession);
+        const updateSessionQuery = `
+        mutation UpdateExistingSession($sessionId: ID!, $updatedSessionDetails: InputCoachSession) {
+          updateExistingSession(sessionId: $sessionId, updatedSessionDetails: $updatedSessionDetails) {
+            _id
+            status
+          }
+        }
         `;
 
         const vars = {
             sessionId: currentSession._id,
             updatedSessionDetails: {
-                review:{
-                    text: reviewData.text,
-                    rating: reviewData.rating
-                }
+                status: "CANCELLED"
             }
-        };
-
-        const data = await graphQLFetch(mutation, vars);
+        }
+        const data = await graphQLFetch(updateSessionQuery, vars);
         console.log("Session status updated", data);
-
         setShowModal(false);
         await fetchSessions();
     }
 
-    const handleCloseModal = () => {
+    const handleCloseModalCancel = () => {
         setShowModal(false);
     }
+    //############################################
+    // HANDLERS - complete
+    //############################################
+
+    const handleCompleteClick = async(session) => {
+        console.log("Complete Clicked:", session)
+
+        // TODO: Add logic to update session status to COMPLETED
+        const query = `
+        mutation UpdateExistingSession($sessionId: ID!, $updatedSessionDetails: InputCoachSession) {
+          updateExistingSession(sessionId: $sessionId, updatedSessionDetails: $updatedSessionDetails) {
+            _id
+            dateTime
+            status
+          }
+        }
+        `
+        const vars = {
+            sessionId: session._id,
+            updatedSessionDetails: {
+                status: "COMPLETED"
+            }
+        }
+        const data = graphQLFetch(query, vars);
+        console.log("Session status updated", data);
+        await fetchSessions();
+        // toggle sessionComplete state. if true, toggle to false. if false, toggle to true
+        setSessionComplete(!sessionComplete);
+        onRefreshUpcoming();
+    };
 
     //############################################
     // COACH SESSION HANDLERS
@@ -88,7 +112,7 @@ const ListingsForSessionsUpcoming = ({ userId, refreshTrigger }) => {
         `;
         const vars = { userId };
         const data = await graphQLFetch(sessionsQuery, vars);
-        const upcomingSessions = data.getAllSessionsForUser.filter(session => session.status === "COMPLETED");
+        const upcomingSessions = data.getAllSessionsForUser.filter(session => session.status === "SCHEDULED");
         const sessionDetails = await Promise.all(upcomingSessions.map(async session => {
             const coacheeDetails = await fetchUserDetails(session.coacheeId);
             const coachDetails = await fetchUserDetails(session.coachId);
@@ -125,22 +149,22 @@ const ListingsForSessionsUpcoming = ({ userId, refreshTrigger }) => {
     return (
         <div>
             {sessions.map(session => (
-                <ListingCardForSession
+                <ListingCardForSessionUpcoming
                     coacheePicUrl={session.coacheePicUrl}
                     coachPicUrl={session.coachPicUrl}
                     coachName={session.coachName}
                     coacheeName={session.coacheeName}
                     sessionDateTime={session.dateTime}
                     sessionLocation={session.location}
-                    buttonLabel="Submit/Edit Review"
-                    buttonAction={() => handleReviewClick(session)}
+                    buttonActionCancel={() => handleCancelClick(session)}
+                    buttonActionComplete={() => handleCompleteClick(session)}
                 />
             ))}
             {showModal && (
-                <ModalForReviews
+                <ModalForSessionCancellation
                     show = {showModal}
-                    onConfirm={handleReviewSubmit}
-                    onCancel={handleCloseModal}
+                    onConfirm={handleConfirmCancellation}
+                    onCancel={handleCloseModalCancel}
                 />
             )}
         </div>

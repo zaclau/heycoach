@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form"
-import ListingCard from "../../components/listingCard/ListingCard"
+import ListingCardForCoach from "../../components/listingCard/ListingCardForCoach"
 import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import CalendarPicker from "../../components/calendarpicker/CalendarPicker";
 import "./bookings.css"
@@ -17,7 +17,6 @@ function Bookings() {
     console.log('Coach object in Bookings: ', coach);
     
     const { register, handleSubmit, formState: { errors } } = useForm();
-
     const [ calendar, setCalendar ] = useState();
     const [ dtErrors, setDtErrors ] = useState();
     const handleBookSession = async (data) => {
@@ -80,14 +79,13 @@ function Bookings() {
             },
         ];
 
-        const connectedAccountId = 'test';
-
-        const stripeSession = await createCheckoutSession(dummy, connectedAccountId, '/#/listings', '/#/bookings');
+        localStorage.setItem('user', JSON.stringify(userManagement.userStore));
+        await createCheckoutSession(dummy, userManagement.userStore.stripeCustomerId, '/#/success', '/#/bookings');
     }
 
     return (
         <div className="container-xxl bd-gutter">
-            <ListingCard 
+            <ListingCardForCoach
                 key={coach._id}
                 firstName={coach.firstName}
                 lastName={coach.lastName}

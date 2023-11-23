@@ -1,16 +1,13 @@
 import React from 'react';
 
-const ListingCardForSessionUpcoming = ({
-                                   coacheePicUrl,
-                                   coachPicUrl,
-                                   coachName,
-                                   coacheeName,
-                                   sessionDateTime,
-                                   sessionLocation,
-                                   // sessionCost,
-                                   // buttonLabel,
-                                   buttonActionCancel,
-                                   buttonActionComplete,
+const ListingCardForSessionCompleted = ({
+                                            coacheePicUrl,
+                                            coachPicUrl,
+                                            coachName,
+                                            coacheeName,
+                                            review,
+                                            buttonLabel,
+                                            buttonAction,
                                }) => {
 
     const formatDate = (dateTime) => {
@@ -31,6 +28,8 @@ const ListingCardForSessionUpcoming = ({
         marginRight: '5px',  // Add right margin
     };
 
+    console.log("Review Prop: ", review);
+
     return (
         <div className="container d-flex justify-content-center p-2">
             <div className="col-10 p-4 border border-1 rounded-4 shadow" style={{ backgroundColor: '#ffffff' }}>
@@ -45,20 +44,27 @@ const ListingCardForSessionUpcoming = ({
                         <h3 className="fw-bold">{coacheeName}</h3>
                     </div>
                     <div className="col-5 text-secondary">
-                        <p className="mb-0 small"><b>Date</b> {formatDate(sessionDateTime)}</p>
-                        <p className="mb-0 small"><b>Time</b> {formatTime(sessionDateTime)}</p>
-                        <p className="mb-2 small"><b>Address</b> {sessionLocation}</p>
-                        {/*<p className="mb-2 small"><b>Fee</b> ${sessionCost}</p>*/}
-                        <button className="btn btn-dark btn-sm me-2" onClick={buttonActionCancel}>Cancel Session</button>
-                        <button className="btn btn-success btn-sm" onClick={buttonActionComplete}>Mark Complete!</button>
+                        {review ? (
+                            <>
+                                <p className="mb-1 small"><b>Score</b> {review.rating} / 5</p>
+                                <p className="mb-0 small"><b>Reflections</b> {review.text}</p>
+                            </>
+                        ) : (
+                            <>
+                                <p className="mb-1 small"><b>Score</b> pending </p>
+                                <p className="mb-2 small"><b>Reflections</b> pending </p>
+                                <button className="btn btn-dark btn-sm" onClick={buttonAction}>{buttonLabel}</button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
+
 }
 
-export default ListingCardForSessionUpcoming;
+export default ListingCardForSessionCompleted;
 
 // import React from 'react';
 //

@@ -1,15 +1,14 @@
 import React from 'react';
 
-const ListingCardForSession = ({
+const ListingCardForSessionUpcoming = ({
                                    coacheePicUrl,
                                    coachPicUrl,
                                    coachName,
                                    coacheeName,
                                    sessionDateTime,
                                    sessionLocation,
-                                   // sessionCost,
-                                   buttonLabel,
-                                   buttonAction,
+                                   buttonActionCancel,
+                                   buttonActionComplete,
                                }) => {
 
     const formatDate = (dateTime) => {
@@ -48,7 +47,8 @@ const ListingCardForSession = ({
                         <p className="mb-0 small"><b>Time</b> {formatTime(sessionDateTime)}</p>
                         <p className="mb-2 small"><b>Address</b> {sessionLocation}</p>
                         {/*<p className="mb-2 small"><b>Fee</b> ${sessionCost}</p>*/}
-                        <button className="btn btn-dark btn-sm" onClick={buttonAction}>{buttonLabel}</button>
+                        <button className="btn btn-dark btn-sm me-2" onClick={buttonActionCancel}>Cancel Session</button>
+                        <button className="btn btn-success btn-sm" onClick={buttonActionComplete}>Mark Complete!</button>
                     </div>
                 </div>
             </div>
@@ -56,7 +56,7 @@ const ListingCardForSession = ({
     )
 }
 
-export default ListingCardForSession;
+export default ListingCardForSessionUpcoming;
 
 // import React from 'react';
 //
