@@ -8,7 +8,7 @@ import ListingCardForSession from "../../components/listingCardForSession/Listin
 import ModalForReviews from "../../modals/ModalForReview/ModalForReviews";
 
 
-const ListingsForSessionsUpcoming = ({ userId }) => {
+const ListingsForSessionsUpcoming = ({ userId, refreshTrigger }) => {
 
     //############################################
     // VARIABLES
@@ -22,7 +22,7 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
     // TODO replace with userId from context
     useEffect(() => {
         fetchSessions();
-    }, [userId]);
+    }, [userId, refreshTrigger]);
 
     //############################################
     // MODAL HANDLERS
