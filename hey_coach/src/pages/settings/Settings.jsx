@@ -8,6 +8,7 @@ import { createStripeAccount } from '../../../server/stripe';
 
 function Settings() {
     const userManagement = useAuthContext();
+    const navigate = useNavigate();
     
     const { register, handleSubmit, formState: { errors } } = useForm();    // See https://www.react-hook-form.com/get-started/#ReactWebVideoTutorial
     const formSubmit = async (data) => {
@@ -77,7 +78,30 @@ function Settings() {
         } catch (error) {
             console.log(error);
         }
-    } 
+    }
+    
+    const handleDeleteUser = async () => {
+        const deleteUserMutation = `
+            mutation deleteUser($userId: ID!) {
+                deleteUser(userId: $userId)
+            }
+        `;
+
+        const userId = userManagement.userStore._id;
+        try {
+            const userDeleted = await graphQLFetch(deleteUserMutation, { userId });
+            // TODO: Delete all related sessions? 
+            if (userDeleted) {
+                userManagement.signOutUser();
+                navigate("/");
+                return;
+            }
+            throw new Error('User does not exist.');
+            
+        } catch (error) {
+            console.log(`Failed to delete user: ${error.message}`);
+        }
+    }
 
     return (
         <div className="container-xxl bd-gutter">
@@ -87,18 +111,26 @@ function Settings() {
             <hr></hr>
 
             <div className="row justify-content-center">
-                <form onSubmit={handleSubmit(formSubmit)} className="col-4">
-                    
-                    <label className="form-label mt-2 mb-1">First Name</label>
-                    <input {...register("firstName", {value: userManagement.userStore.firstName, required: 'First name is required.'})} className="form-control text-white bg-dark rounded-pill" placeholder="First Name"></input>
-                    
-                    <label className="form-label mt-2 mb-1">Last Name</label>
-                    <input {...register("lastName", {value: userManagement.userStore.lastName})} className="form-control text-white bg-dark rounded-pill" placeholder="Last Name"></input>
+                <div className="col-4">
+                    <form onSubmit={handleSubmit(formSubmit)}>
+                        
+                        <label className="form-label mt-2 mb-1">First Name</label>
+                        <input {...register("firstName", {value: userManagement.userStore.firstName, required: 'First name is required.'})} className="form-control text-white bg-dark rounded-pill" placeholder="First Name"></input>
+                        
+                        <label className="form-label mt-2 mb-1">Last Name</label>
+                        <input {...register("lastName", {value: userManagement.userStore.lastName})} className="form-control text-white bg-dark rounded-pill" placeholder="Last Name"></input>
 
-                    <input type="submit" value="Save Changes" className="form-control btn btn-light mt-4"/>
-                    
-                    <hr></hr>
-                </form>
+                        <input type="submit" value="Save Changes" className="form-control btn btn-light mt-4"/>
+                        
+                        <hr></hr>
+                    </form>
+
+                    <button 
+                        className='form-control btn btn-danger col-4'
+                        onClick={ handleDeleteUser }>
+                        Delete Your Account
+                    </button>
+                </div>
             </div>
         </div>
     );
