@@ -19,7 +19,7 @@ db.dropDatabase()
 db.createCollection("users");
 
 let n_users = 300; // Total number of users
-let n_sessions = 5_000;
+let n_sessions = 2000;
 
 const goals = ["StrengthBuilding", "EnduranceBuilding", "AgilityBuilding", "FatBurn", "Wellness", "MentalFocus"]
 const specialties = ["Judo", "Yoga", "BJJ", "Running", "Acrobatics", "Dance"]
@@ -40,7 +40,8 @@ for (let i = 1; i <= n_users; i++) {
             description: faker.lorem.paragraph(),
             tagsOfSpecialties: [specialties[Math.floor(Math.random() * specialties.length)], specialties[Math.floor(Math.random() * specialties.length)]],
             sessionDuration: faker.number.int({ min: 30, max: 120 }),
-            sessionPrice: faker.commerce.price()
+            sessionPrice: faker.commerce.price(),
+            location: faker.location.streetAddress()
         } : null,
         profileAsCoachee: i % 2 !== 0 ? {
             description: faker.lorem.paragraph(),
