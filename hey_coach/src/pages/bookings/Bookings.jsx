@@ -19,7 +19,16 @@ function Bookings() {
     const { register, handleSubmit, formState: { errors } } = useForm();
 
     const [ calendar, setCalendar ] = useState();
+    const [ dtErrors, setDtErrors ] = useState();
     const handleBookSession = async (data) => {
+        // Validate session datetime
+        if (calendar) {
+            setDtErrors(null);
+        } else {
+            setDtErrors('Please select a date and time for your session.');
+            return;
+        }
+
         const originalDate = new Date(calendar.$d);
         const dateTime = originalDate.toISOString();
         const status = 'SCHEDULED';
@@ -95,6 +104,7 @@ function Bookings() {
                                 <label className="form-label mt-2 mb-1 fw-bold">Session Date & Time</label>
                                 <div id="calendar">
                                     <CalendarPicker calendar={ calendar } setCalendar={ setCalendar } />
+                                    { dtErrors && <ErrorMessage message={ dtErrors }/> }
                                 </div>
                                 {errors.password && <ErrorMessage message={errors.password?.message} />}
                             </div>
