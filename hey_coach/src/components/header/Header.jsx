@@ -11,7 +11,7 @@ const Header = ({ type }) => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    navigate("/listings", { state: { searchTerm } });
+    navigate(`/listings?search=${searchTerm}`, { state: { searchTerm } });
   };
 
   return (
