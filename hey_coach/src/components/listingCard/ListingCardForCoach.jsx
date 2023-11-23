@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ListingCard = ({ firstName, lastName, description, price, profilePicture, buttonDesc, buttonAction }) => {
+const ListingCardForCoach = ({ firstName, lastName, description, price, profilePicture, buttonDesc, buttonAction }) => {
     return (
         <div className="container d-flex justify-content-center p-2">
             <div className="col-8 p-4 border border-1 rounded-4 shadow">
@@ -34,4 +34,4 @@ const ListingCard = ({ firstName, lastName, description, price, profilePicture, 
     )
 }
 
-export default ListingCard;
+export default ListingCardForCoach;

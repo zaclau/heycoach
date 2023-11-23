@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 
 // COMPONENETS
-import ListingCardForSessionCompleted from "../../components/listingCardForSession/ListingCardForSessionCompleted";
+import ListingCardForSessionCompleted from "../../components/listingCard/ListingCardForSessionCompleted";
 import ModalForSessionCancellation from "../../modals/ModalForSessionCancellation/ModalForSessionCancellation";
 import ListingCardForSessionUpcoming
-    from "../../components/listingCardForSessionUpcoming/ListingCardForSessionUpcoming";
+    from "../../components/listingCard/ListingCardForSessionUpcoming";
 
 const ListingsForSessionsUpcoming = ({ userId, onRefreshUpcoming }) => {
     console.log('UserId in upcoming listings: ', userId);

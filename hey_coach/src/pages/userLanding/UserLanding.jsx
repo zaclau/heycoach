@@ -9,9 +9,9 @@ import "./userLanding.css";
 // import SearchBar from "../../components/searchBar/SearchBar";
 
 // New
-import ListingsForSessionsUpcoming from "../listingsForSessionsUpcoming/ListingsForSessionsUpcoming";
+import ListingsForSessionsUpcoming from "./ListingsForSessionsUpcoming";
 import HeaderUser from "../../components/headerUser/HeaderUser";
-import ListingsForSessionsCompleted from "../listingsForSessionsCompleted/ListingsForSessionsCompleted";
+import ListingsForSessionsCompleted from "./ListingsForSessionsCompleted";
 import {useAuthContext} from "../../auth/auth";
 
 

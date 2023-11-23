@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 
 // COMPONENETS
-import ListingCardForSessionCompleted from "../../components/listingCardForSession/ListingCardForSessionCompleted";
+import ListingCardForSessionCompleted from "../../components/listingCard/ListingCardForSessionCompleted";
 import ModalForReviews from "../../modals/ModalForReview/ModalForReviews";
 
 
