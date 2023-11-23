@@ -1,6 +1,6 @@
 import React, { useEffect, useState , Fragment} from 'react';
 import { useParams, useNavigate } from "react-router";
-import ListingCard from "../../components/listingCard/ListingCard"
+import ListingCardForCoach from "../../components/listingCard/ListingCardForCoach"
 import SocialMediaCard from "../../components/socialMedia/SocialMediaCard";
 import ReviewComments from "../../components/reviewComments/ReviewComments";
 import { graphQLFetch } from "../../graphQL/graphQLFetch";
@@ -115,7 +115,7 @@ function CoachProfile() {
     return (
         <>
             <div className="container-xxl bd-gutter">
-                <ListingCard
+                <ListingCardForCoach
                     key={coach._id}
                     firstName={coach.firstName}
                     lastName={coach.lastName}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form"
-import ListingCard from "../../components/listingCard/ListingCard"
+import ListingCardForCoach from "../../components/listingCard/ListingCardForCoach"
 import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import CalendarPicker from "../../components/calendarpicker/CalendarPicker";
 import "./bookings.css"
@@ -18,8 +18,16 @@ function Bookings() {
     
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [ calendar, setCalendar ] = useState();
-
+    const [ dtErrors, setDtErrors ] = useState();
     const handleBookSession = async (data) => {
+        // Validate session datetime
+        if (calendar) {
+            setDtErrors(null);
+        } else {
+            setDtErrors('Please select a date and time for your session.');
+            return;
+        }
+
         const originalDate = new Date(calendar.$d);
         const dateTime = originalDate.toISOString();
         const status = 'SCHEDULED';
@@ -77,7 +85,7 @@ function Bookings() {
 
     return (
         <div className="container-xxl bd-gutter">
-            <ListingCard 
+            <ListingCardForCoach
                 key={coach._id}
                 firstName={coach.firstName}
                 lastName={coach.lastName}
@@ -94,6 +102,7 @@ function Bookings() {
                                 <label className="form-label mt-2 mb-1 fw-bold">Session Date & Time</label>
                                 <div id="calendar">
                                     <CalendarPicker calendar={ calendar } setCalendar={ setCalendar } />
+                                    { dtErrors && <ErrorMessage message={ dtErrors }/> }
                                 </div>
                                 {errors.password && <ErrorMessage message={errors.password?.message} />}
                             </div>

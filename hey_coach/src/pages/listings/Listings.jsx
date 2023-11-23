@@ -18,7 +18,7 @@ useEffect
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import ListingCard from '../../components/listingCard/ListingCard';
+import ListingCardForCoach from '../../components/listingCard/ListingCardForCoach';
 import SearchBar from '../../components/searchBar/SearchBar';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 import { useAuthContext } from '../../auth/auth';
@@ -99,7 +99,7 @@ const Listings = () => {
                 />
             </div>
             {coaches.map(coach => (
-                <ListingCard
+                <ListingCardForCoach
                     key={coach._id}
                     firstName={coach.firstName}
                     lastName={coach.lastName}
