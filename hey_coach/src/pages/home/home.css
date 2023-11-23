@@ -1,12 +1,19 @@
-.homeContainer {
-    margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
+/* home.css */
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 90vh; /* Ensures it's at least the height of the viewport */
 }
 
-.homeTitle {
-    width: 1024px;
-    font-size: 20px;
+.content-container {
+  flex: 1; /* Allows this container to grow and shrink as needed */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center; /* Center children vertically */
+}
+
+.footer-container {
+  margin-top: auto; /* Pushes the footer to the bottom */
+  justify-content: center;
 }

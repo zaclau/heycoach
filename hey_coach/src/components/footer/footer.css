@@ -1,14 +1,21 @@
-.footer {
-    width: 100%;
-    width: 1024px;
-    font-size: 12px;
-}
+/*.footer {*/
+/*    width: 100%;*/
+/*    width: 1024px;*/
+/*    font-size: 12px;*/
+/*}*/
 
 .fLists {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     margin-bottom: 50px;
+}
+
+.fText{
+    width: 100%;
+    display: flex;
+    font-size: 12px;
+    justify-content: center;
 }
 
 .fList {
@@ -21,3 +28,4 @@
     color: #003580;
     cursor: pointer;
 }
+

@@ -19,9 +19,18 @@ const Home = () => {
   console.log('userManagement.userStore at HOME: ', userManagement.userStore);
   return (
     <div>
-      <Header/>
-      {/*<h1>"USER LANDING"</h1>*/}
-      {_uid && <UserLanding/>}
+        <div className="home-container">
+
+            <div className ="content-container mb-5">
+                <Header/>
+                {/*<h1>"USER LANDING"</h1>*/}
+                {_uid && <UserLanding/>}
+            </div>
+
+            <div className="footer-container mb-2">
+                <Footer/>
+            </div>
+        </div>
     </div>
   );
 };
