@@ -18,6 +18,8 @@ import {useAuthContext} from "../../auth/auth";
 const UserLanding = () => {
     const userManagement = useAuthContext();
     const _uid = userManagement.userStore._id;
+    // const _uid = "655db2f90daf3eeeb1f84ef2" // Davin, works
+    // const _uid = "655e10a9b6af4323d62f1964" // Lenn, breaks
 
     return (
         <div>
