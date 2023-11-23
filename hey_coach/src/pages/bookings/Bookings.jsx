@@ -17,8 +17,8 @@ function Bookings() {
     console.log('Coach object in Bookings: ', coach);
     
     const { register, handleSubmit, formState: { errors } } = useForm();
-
     const [ calendar, setCalendar ] = useState();
+
     const handleBookSession = async (data) => {
         const originalDate = new Date(calendar.$d);
         const dateTime = originalDate.toISOString();
@@ -71,9 +71,8 @@ function Bookings() {
             },
         ];
 
-        const connectedAccountId = 'test';
-
-        const stripeSession = await createCheckoutSession(dummy, connectedAccountId, '/#/listings', '/#/bookings');
+        localStorage.setItem('user', JSON.stringify(userManagement.userStore));
+        await createCheckoutSession(dummy, userManagement.userStore.stripeCustomerId, '/#/success', '/#/bookings');
     }
 
     return (
