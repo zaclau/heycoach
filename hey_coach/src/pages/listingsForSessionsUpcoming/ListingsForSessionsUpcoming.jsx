@@ -6,18 +6,20 @@ import { graphQLFetch } from '../../graphQL/graphQLFetch';
 // COMPONENETS
 import ListingCardForSession from "../../components/listingCardForSession/ListingCardForSession";
 import ModalForSessionCancellation from "../../modals/ModalForSessionCancellation/ModalForSessionCancellation";
+import ListingCardForSessionUpcoming
+    from "../../components/listingCardForSessionUpcoming/ListingCardForSessionUpcoming";
 
-
-const ListingsForSessionsUpcoming = ({ userId }) => {
+const ListingsForSessionsUpcoming = ({ userId, onRefreshUpcoming }) => {
     console.log('UserId in upcoming listings: ', userId);
 
     //############################################
     // VARIABLES
     //############################################
-
+    const [refreshUpcomingSessions, setRefreshUpcomingSessions] = useState(false);
     const [sessions, setSessions] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [currentSession, setCurrentSession] = useState(null); // TODO: what is currentSession For?
+    const [currentSession, setCurrentSession] = useState(null);
+    const [sessionComplete, setSessionComplete] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -25,7 +27,7 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
     }, [userId]);
 
     //############################################
-    // MODAL HANDLERS
+    // HANDLERS - cancel w modal
     //############################################
 
     const handleCancelClick = (session) => {
@@ -57,9 +59,39 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
         await fetchSessions();
     }
 
-    const handleCloseModal = () => {
+    const handleCloseModalCancel = () => {
         setShowModal(false);
     }
+    //############################################
+    // HANDLERS - complete
+    //############################################
+
+    const handleCompleteClick = async(session) => {
+        console.log("Complete Clicked:", session)
+
+        // TODO: Add logic to update session status to COMPLETED
+        const query = `
+        mutation UpdateExistingSession($sessionId: ID!, $updatedSessionDetails: InputCoachSession) {
+          updateExistingSession(sessionId: $sessionId, updatedSessionDetails: $updatedSessionDetails) {
+            _id
+            dateTime
+            status
+          }
+        }
+        `
+        const vars = {
+            sessionId: session._id,
+            updatedSessionDetails: {
+                status: "COMPLETED"
+            }
+        }
+        const data = graphQLFetch(query, vars);
+        console.log("Session status updated", data);
+        await fetchSessions();
+        // toggle sessionComplete state. if true, toggle to false. if false, toggle to true
+        setSessionComplete(!sessionComplete);
+        onRefreshUpcoming();
+    };
 
     //############################################
     // COACH SESSION HANDLERS
@@ -117,22 +149,22 @@ const ListingsForSessionsUpcoming = ({ userId }) => {
     return (
         <div>
             {sessions.map(session => (
-                <ListingCardForSession
+                <ListingCardForSessionUpcoming
                     coacheePicUrl={session.coacheePicUrl}
                     coachPicUrl={session.coachPicUrl}
                     coachName={session.coachName}
                     coacheeName={session.coacheeName}
                     sessionDateTime={session.dateTime}
                     sessionLocation={session.location}
-                    buttonLabel="Cancel Session"
-                    buttonAction={() => handleCancelClick(session)}
+                    buttonActionCancel={() => handleCancelClick(session)}
+                    buttonActionComplete={() => handleCompleteClick(session)}
                 />
             ))}
             {showModal && (
                 <ModalForSessionCancellation
                     show = {showModal}
                     onConfirm={handleConfirmCancellation}
-                    onCancel={handleCloseModal}
+                    onCancel={handleCloseModalCancel}
                 />
             )}
         </div>
