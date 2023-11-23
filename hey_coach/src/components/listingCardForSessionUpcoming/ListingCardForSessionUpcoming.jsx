@@ -7,8 +7,6 @@ const ListingCardForSessionUpcoming = ({
                                    coacheeName,
                                    sessionDateTime,
                                    sessionLocation,
-                                   // sessionCost,
-                                   // buttonLabel,
                                    buttonActionCancel,
                                    buttonActionComplete,
                                }) => {

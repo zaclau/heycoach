@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 
 // COMPONENETS
-import ListingCardForSession from "../../components/listingCardForSession/ListingCardForSession";
+import ListingCardForSessionCompleted from "../../components/listingCardForSession/ListingCardForSessionCompleted";
 import ModalForReviews from "../../modals/ModalForReview/ModalForReviews";
 
 
@@ -59,7 +59,8 @@ const ListingsForSessionsUpcoming = ({ userId, refreshTrigger }) => {
         };
 
         const data = await graphQLFetch(mutation, vars);
-        console.log("Session status updated", data);
+        console.log("review updates", vars);
+        console.log("review updated", data);
 
         setShowModal(false);
         await fetchSessions();
@@ -83,6 +84,10 @@ const ListingsForSessionsUpcoming = ({ userId, refreshTrigger }) => {
                     dateTime
                     status
                     location
+                    review {
+                        text
+                        rating
+                    }
                 }
             }
         `;
@@ -125,14 +130,13 @@ const ListingsForSessionsUpcoming = ({ userId, refreshTrigger }) => {
     return (
         <div>
             {sessions.map(session => (
-                <ListingCardForSession
+                <ListingCardForSessionCompleted
                     coacheePicUrl={session.coacheePicUrl}
                     coachPicUrl={session.coachPicUrl}
                     coachName={session.coachName}
                     coacheeName={session.coacheeName}
-                    sessionDateTime={session.dateTime}
-                    sessionLocation={session.location}
-                    buttonLabel="Submit/Edit Review"
+                    review={session.review}
+                    buttonLabel="Submit Review"
                     buttonAction={() => handleReviewClick(session)}
                 />
             ))}
