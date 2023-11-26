@@ -4,6 +4,13 @@ import React from 'react';
 import "./searchbar.css"
 
 function SearchBar({ setSearchTerm, searchTerm, onSearch }) {
+    const handleKeyPress = (event) => {
+        console.log('Key pressed in search bar: ', event.key);
+        // Trigger search when Enter key is pressed
+        if (event.key === 'Enter'){
+            onSearch(searchTerm);
+        }
+    }
     return (
         <div className="d-flex justify-content-center">
             <div className="input-group w-50">
@@ -14,6 +21,7 @@ function SearchBar({ setSearchTerm, searchTerm, onSearch }) {
                         className="headerSearchInput form-control text-white bg-dark rounded-start-pill"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={(e) => handleKeyPress(e)}
                     />
                 </div>
 
