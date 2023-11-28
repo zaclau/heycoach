@@ -5,7 +5,6 @@ import "./searchbar.css"
 
 function SearchBar({ setSearchTerm, searchTerm, onSearch }) {
     const handleKeyPress = (event) => {
-        console.log('Key pressed in search bar: ', event.key);
         // Trigger search when Enter key is pressed
         if (event.key === 'Enter'){
             onSearch(searchTerm);
