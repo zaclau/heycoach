@@ -4,6 +4,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { graphQLFetch } from "../../graphQL/graphQLFetch";
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../auth/auth';
+import Footer from '../../components/footer/Footer';
 
 function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
@@ -85,12 +86,20 @@ function Login() {
     });
     return (
         <div className="container-xxl bd-gutter">
-            <h1 className="text-center fw-bolder my-5">
-                You're one click <br></br> away to exclusive <br></br> 1:1 Sessions
-            </h1>
+            <div className='d-flex flex-column ' style={{height: "90vh"}}>
+                <div className='d-flex flex-column justify-content-center flex-grow-1 mb-5'>
+                <h1 className="text-center fw-bolder my-5">
+                    You're one click <br></br> away to exclusive <br></br> 1:1 Sessions
+                </h1>
 
-            <div className="row justify-content-center">
-                <button onClick={() => login()} className="form-control btn btn-light mt-4 col-4">Sign in with Google</button>
+                <div className="row justify-content-center">
+                    <div className='col-4'>
+                        <button onClick={() => login()} className="form-control btn btn-light">Sign in with Google</button>
+                    </div>
+                </div>
+                </div>
+
+                <div className='mt-auto mb-2 pt-5'><Footer /></div>
             </div>
         </div>
     )

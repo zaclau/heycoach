@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, HashRouter } from "react-router-dom";
 import Pages from "./Pages.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthContextProvider } from './auth/auth.jsx';
 

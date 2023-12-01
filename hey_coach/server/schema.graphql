@@ -25,6 +25,7 @@ type User {
   # TOKENS
   googleOuthToken: String
   stripeCustomerId: String
+  instagramAccessToken: String
 
   #    # LOGS
   #    "Timestamp for datetime"
@@ -135,6 +136,7 @@ input InputsForUserProfile {
   profileAsCoach: InputCoachProfile
   profileAsCoachee: InputCoacheeProfile
   stripeCustomerId: String
+  instagramAccessToken: String
 }
 
 input InputCoachProfile {

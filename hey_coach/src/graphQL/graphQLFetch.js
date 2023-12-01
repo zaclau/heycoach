@@ -1,4 +1,4 @@
-export async function graphQLFetch(query, variables = {}) {
+async function graphQLFetch(query, variables = {}) {
     try {
         const response = await fetch('/graphql', {
           method: 'POST',
@@ -25,3 +25,5 @@ export async function graphQLFetch(query, variables = {}) {
         throw new Error(`${e.message}`);
     }
 }
+
+module.exports = { graphQLFetch };

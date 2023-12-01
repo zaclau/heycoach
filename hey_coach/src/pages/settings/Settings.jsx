@@ -4,7 +4,8 @@ import ErrorMessage from "../../components/errorMessage/ErrorMessage";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { graphQLFetch } from '../../graphQL/graphQLFetch';
 import { useAuthContext } from '../../auth/auth';
-import { createStripeAccount } from '../../../server/stripe';
+import { getAuthorization } from '../../../server/instagram';
+
 
 function Settings() {
     const userManagement = useAuthContext();
@@ -79,6 +80,14 @@ function Settings() {
             console.log(error);
         }
     }
+
+    const handleInstagramAuth = () => {
+        console.log('handleInstagramAuth entered. ');
+        console.log('User when instagram button clicked: ', userManagement.userStore);
+        sessionStorage.setItem('user', JSON.stringify(userManagement.userStore));
+        localStorage.setItem('user', JSON.stringify(userManagement.userStore));
+        getAuthorization();
+    }
     
     const handleDeleteUser = async () => {
         const deleteUserMutation = `
@@ -108,7 +117,7 @@ function Settings() {
             <h1 className="text-center fw-bolder my-5">
                 Settings <br></br>
             </h1>
-            <hr></hr>
+            <hr className='col-8 mx-auto'></hr>
 
             <div className="row justify-content-center">
                 <div className="col-4">
@@ -120,13 +129,25 @@ function Settings() {
                         <label className="form-label mt-2 mb-1">Last Name</label>
                         <input {...register("lastName", {value: userManagement.userStore.lastName})} className="form-control text-white bg-dark rounded-pill" placeholder="Last Name"></input>
 
-                        <input type="submit" value="Save Changes" className="form-control btn btn-light mt-4"/>
+                        <input type="submit" value="Save Changes" className="form-control btn btn-light mt-4 mb-2"/>
                         
                         <hr></hr>
                     </form>
 
+
+                    {userManagement.userStore.profileAsCoach &&
+                        <>
+                            <button 
+                                onClick={ handleInstagramAuth }
+                                className="form-control btn btn-dark my-2">
+                                <i className='bi bi-instagram me-3'></i>
+                                Link Your Instagram Profile
+                            </button>
+                            <hr></hr>
+                        </>}
+
                     <button 
-                        className='form-control btn btn-danger col-4'
+                        className='form-control btn btn-danger col-4 my-2'
                         onClick={ handleDeleteUser }>
                         Delete Your Account
                     </button>

@@ -19,9 +19,6 @@ const Navbar = () => {
     navigate("/");
   }
 
-  const goSettings = () => {
-    navigate("/settings");
-  }
 
   return (
     <div className="navbar navbar-expand justify-content-center">
@@ -37,11 +34,12 @@ const Navbar = () => {
             <div className="navItems">
                 {userManagement && userManagement.userStore 
                     ? <div>
-                        <img 
-                            onClick={ goSettings }
-                            className='rounded-circle' 
-                            width="30px"
-                            src={ userManagement.userStore.profilePicture }></img>
+                        <a href='/#/settings'>
+                          <img 
+                              className='rounded-circle' 
+                              width="30px"
+                              src={ userManagement.userStore.profilePicture }></img>
+                        </a>
                         <button className="btn btn-link link-dark fw-bold" onClick={ goLogout }>
                           Logout
                         </button>

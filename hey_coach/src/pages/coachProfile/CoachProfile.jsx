@@ -4,6 +4,7 @@ import ListingCardForCoach from "../../components/listingCard/ListingCardForCoac
 import SocialMediaCard from "../../components/socialMedia/SocialMediaCard";
 import ReviewComments from "../../components/reviewComments/ReviewComments";
 import { graphQLFetch } from "../../graphQL/graphQLFetch";
+import Axios from 'axios';
 
 
 function CoachProfile() {
@@ -13,7 +14,9 @@ function CoachProfile() {
     // Variables
     const [coach, setCoach] = useState(null);
     const [validSessions, setValidSessions] = useState([]);
-
+    const [instagramMedia, setInstagramMedia] = useState(null);
+    const instagramMediaFields = 'caption,id,media_type,media_url,permalink,thumbnail_url,timestamp,username';
+    const instagramMediaLimit = 5;
 
     useEffect(() => {
         fetchCoach();
@@ -28,6 +31,7 @@ function CoachProfile() {
                     firstName
                     lastName
                     profilePicture
+                    instagramAccessToken
                     profileAsCoach {
                         description
                         tagsOfSpecialties
@@ -48,6 +52,7 @@ function CoachProfile() {
         if (data) {
             setCoach(data.getUserById);
             await fetchSessionsWithReviews();
+            await fetchInstragramMedia(data.getUserById.instagramAccessToken);
         }
     };
 
@@ -104,13 +109,43 @@ function CoachProfile() {
         navigate("/bookings", { state: {coach: coach} });
     }
 
+    const fetchInstragramMedia = async (accessToken) => {
+        console.log('fetchInstragramMedia entered. ');
+        if (!accessToken) return;
+
+        // Call backend to fetch instagram media
+        const api = Axios.create({
+            baseURL: process.env.REACT_APP_DOMAIN,
+            timeout: 5000,  // abort if request takes longer than 5 seconds
+            headers: {'Content-Type': 'application/json'},
+        });
+        try {
+            const response = await api.post('api/v1/instagram/fetch-media', { 
+                fields: instagramMediaFields, 
+                access_token: accessToken,
+                limit: instagramMediaLimit
+            });
+            console.log('response: ', response);
+            setInstagramMedia(response.data);
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    }
+
 
     // Render a loading state until the coach data is fetched
-    if (!coach) return <p>Loading...</p>;
+    if (!coach) 
+        return <div className='container-xxl bd-gutter'>
+                    <div className='d-flex flex-column justify-content-center align-items-center' style={{height: "100vh"}}>
+                        <div className='spinner-grow text-secondary'></div>
+                        <h4 className='text-center text-secondary mt-2'>Loading...</h4>
+                    </div>
+                </div>;
 
     // Log session data to console
     // Debugs
     console.log("Valid Sessions:", validSessions);
+    console.log("Instagram media", instagramMedia);
 
     return (
         <>
@@ -126,6 +161,26 @@ function CoachProfile() {
                     buttonAction={() => handleScheduleSession()}
                 />
                 <hr></hr>
+
+                {instagramMedia && 
+                    <>
+                        <h3 className="fw-semibold mt-4">Recent Posts</h3>
+                        <div className="container d-flex flex-row mb-3">
+                            {instagramMedia.map(media => (
+                                <SocialMediaCard
+                                    key={media.id}
+                                    url={media.media_url}
+                                    mediaType={media.media_type}
+                                    caption={media.caption}
+                                    timestamp={media.timestamp}
+                                    username={media.username}
+                                    permalink={media.permalink}
+                                />
+                            ))}
+                        </div>
+                        <hr></hr>
+                    </>}
+                
 
                 <h3 className="fw-semibold mt-4">What Others Say</h3>
                 <div className="container">

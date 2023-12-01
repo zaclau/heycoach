@@ -1,6 +1,9 @@
 // Core Node Modules
 const fs = require('fs');
 const express = require('express');
+const cookieParser = require("cookie-parser");
+const https = require('https');
+require('dotenv').config('../.env');
 
 // Apollo Server and GraphQL Modules
 const { ApolloServer, UserInputError } = require('apollo-server-express');
@@ -12,6 +15,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 
 // Custom Scalars (GraphQL)
 const { DateTimeResolver } = require('graphql-scalars');
+const { getAuthorizationCode, getAccessToken, getUserMedia } = require('./instagram');
 
 /******************************************* 
 DATABASE CONNECTION CODE
@@ -240,9 +244,11 @@ async function updateUserProfileResolver(_, args) {
             { _id: new ObjectId(userId) },
             { $set: updateDocument }
         );
+        console.log('Updated the user profile'); // Debugging log
 
         // Retrieve and return the updated user data
         const updatedUser = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+        console.log('Updated user:', updatedUser); // Debugging log
         return updatedUser;
 
     } catch (error) {
@@ -333,9 +339,10 @@ async function updateSessionResolver(_, args) {
 // ############################################
 
 const app = express();
-
 // Attaching a Static web server.
 app.use(express.static('public'));
+app.use(express.json()); // needed for POST /instagram/update-user endpoint, see https://stackoverflow.com/questions/70756327/req-body-returns-an-empty-object-eventhough-data-is-passed-through-form
+app.use(cookieParser()); // needed for POST /instagram/update-user endpoint, see http://expressjs.com/en/4x/api.html#req.cookies 
 
 // Creating and attaching a GraphQL API server.
 const server = new ApolloServer({
@@ -344,6 +351,55 @@ const server = new ApolloServer({
     formatError: error => {
         console.log(error);
         return error;
+    }
+});
+
+app.get("/api/v1/instagram/get-auth-code", (req, res, next) => {
+    return res.redirect(`https://api.instagram.com/oauth/authorize?client_id=${process.env.REACT_APP_INSTAGRAM_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_INSTAGRAM_REDIRECT_URI}&scope=user_media,user_profile&response_type=code`);
+});
+
+app.get("/api/v1/instagram/auth", async (req, res, next) => {
+    console.log("Query params for /api/v1/instagram/auth:", req.query);
+    try {
+        const code = await getAuthorizationCode(req);
+        const token = await getAccessToken(code);
+
+        // Set cookie to store token
+        res.cookie('token', token.access_token, { secure: true, httpOnly: true, sameSite: 'none' });
+        res.redirect('/#/instagram-success');
+    } catch (e) {
+        console.log(e.message);
+    }    
+});
+
+app.post("/api/v1/instagram/update-user", async (req, res, next) => {
+    console.log("Req body for /instagram/update-user:", req.body);
+    console.log("Req cookies for /instagram/update-user:", req.cookies);
+    const userId = req.body?.userId;
+    const accessToken = req.cookies?.token;
+    try {
+        const updatedUser = await updateUserProfileResolver(null, { userId, updatedProfile: { instagramAccessToken: accessToken } }); // TODO: Change to request instead of using resolver directly
+        res.clearCookie('token');
+        res.status(200).json(updatedUser);
+    } catch (e) {
+        console.log(e.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post("/api/v1/instagram/fetch-media", async (req, res, next) => {
+    console.log("Req body for /api/v1/instagram/fetch-media:", req.body);
+    console.log("Req cookies for /api/v1/instagram/fetch-media:", req.cookies);
+    const fields = req.body?.fields;
+    const accessToken = req.body?.access_token;
+    const limit = req.body?.limit;
+    try {
+        const media = await getUserMedia(fields, accessToken, limit); 
+        console.log('API got media: ', media);
+        res.status(200).json(media.data);
+    } catch (e) {
+        console.log(e.message);
+        res.status(500).send(e.message);
     }
 });
 
@@ -359,8 +415,14 @@ async function startServer() {
         server.applyMiddleware({app, path: '/graphql'});
 
         // Starting the Express server
-        app.listen(3000, function () {
-            console.log('App started on port 3000');
+        var options = {
+            key: fs.readFileSync('client-key.pem'),
+            cert: fs.readFileSync('client-cert.pem')
+        };
+
+        // Create an HTTPS service identical to the HTTP service.
+        https.createServer(options, app).listen(3000, function () {
+            console.log('App started on port 3000 for HTTPS');
         });
     } catch (error) {
         console.error('Failed to start the server:', error);

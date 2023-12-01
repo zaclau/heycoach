@@ -13,6 +13,7 @@ import SignupCoachee from "./pages/signup/SignupCoachee.jsx";
 import UserLanding from "./pages/userLanding/UserLanding";
 import Settings from './pages/settings/Settings.jsx';
 import Success from './pages/success/Success.jsx';
+import Instagram from './pages/Instagram.jsx';
 import { AuthRequired } from './auth/auth.jsx';
 
 const NotFound = () => <h1>Page Not Found</h1>;
@@ -37,6 +38,7 @@ function Contents() {
         </AuthRequired>} />
       <Route path="/coaches/:coachId" element={<CoachProfile />} />
       <Route path="/success" element={<Success />} />
+      <Route path="/instagram-success" element={<Instagram />} />
       <Route path="*" element={<NotFound />} /> {/* Adjusted for handling 404 pages */}
     </Routes>
   );
