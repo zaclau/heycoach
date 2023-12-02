@@ -12,6 +12,7 @@
 - **Seamless Account Creation**: Integrated Google Authentication for streamlined user sign-up and sign-in processes.
 - **Automated Coach Compensation**: Integrated Stripe API for the creation of coach accounts to facilitate direct payments, managed at the point of account creation.
 - **Simplified Payments for Coachees**: Enabled easy payment processing for coachee transactions via Stripe, without the need for account setup.
+- **Integrated Insta Marketing for Coaches**: Integrated Instagram API for coaches. Their profile page will then display their 4 most recent instagram posts to potential coachees. 
 - **Discovery and Search Functionality**: Developed a search interface with filters for coach discovery, complemented by detailed coach profiles and user-generated reviews.
 - **Efficient Booking System**: Designed a user-friendly booking interface with integrated calendar functionality for convenient scheduling.
 - **Synthetic Data Generation for Testing**: Utilized FakerJS within an initmongo.js script for the creation of mock accounts and session data to test system robustness.
