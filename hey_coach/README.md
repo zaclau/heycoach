@@ -31,6 +31,7 @@
 - Styling: Bootstrap for responsive design, complemented with custom CSS
 - Payment Processing: Stripe API for dual (coach and coachee) transaction handling
 - Authentication: Google Auth API for secure logins
+- Marketing: Instagram API for coach profile pages to show their latest insta posts
 - Local Storage: Browser's local storage for maintaining session states
 
 #### 📦 Deployment and Bundling:
