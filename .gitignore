@@ -1,17 +1,17 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-hey_coach/node_modules
-hey_coach/.pnp
-hey_coach/.pnp.js
+/node_modules
+/.pnp
+.pnp.js
 
 # testing
-hey_coach/coverage
+/coverage
 
 # production
-hey_coach/build
-hey_coach/public/*
-!hey_coach/public/index.html
+/build
+/public/*
+!/public/index.html
 
 
 # misc
@@ -21,7 +21,6 @@ hey_coach/public/*
 .env.test.local
 .env.production.local
 
-hey_coach/npm-debug.log*
-hey_coach/yarn-debug.log*
-hey_coach/yarn-error.log*
-hey_coach/public/app.bundle.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
