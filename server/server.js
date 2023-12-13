@@ -26,7 +26,7 @@ let db;
 
 // Function to connect to the database
 async function connectToDb() {
-    const url = 'mongodb://localhost/heycoach';
+    const url = process.env.DB_URL;
     const client = new MongoClient(url, { useNewUrlParser: true });
 
     try {
