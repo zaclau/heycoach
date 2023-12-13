@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   node: 
-    build: .
+    image: zaclau/heycoach
     environment:
       NODE_ENV: development
       DB_URL: mongodb://mongo/heycoach
