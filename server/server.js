@@ -23,6 +23,7 @@ DATABASE CONNECTION CODE
 // Note that the below variable is a global variable
 // that is initialized in the connectToDb function and used elsewhere.
 let db;
+console.log('DB_URL:', process.env.DB_URL);
 
 // Function to connect to the database
 async function connectToDb() {
